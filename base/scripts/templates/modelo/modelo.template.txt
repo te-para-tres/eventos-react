@@ -1,0 +1,6 @@
+import { IModeloBase } from "@base/interfaces/models/modelo-base.interface";
+
+export interface NOMBRE_MODELO extends IModeloBase {
+  CAMPO_1?: TIPO_CAMPO;
+  //RESTO DE CAMPOS
+}

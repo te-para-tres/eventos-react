@@ -1,0 +1,59 @@
+import React from "react";
+import ActionsButton from "@base/components/buttons/ActionsButton";
+import useHttp from "@base/hooks/useHttp/useHttp";
+import QueryProps from "@base/interfaces/requests/query-props.interface";
+import { TablaQueryColumnsType } from "@base/components/tables/TablaQuery";
+import { NOMBRE_MODELO } from "./NOMBRE_MODELO.interface";
+
+export default function useNOMBRE_MODELO() {
+  const http = useHttp();
+
+  const rutaBase = RUTA_BASE;
+  const rutaDetalle = `${rutaBase}/detalle`;
+  const nombrePlural = NOMBRE_PLURAL;
+  const nombreSingular = NOMBRE_SINGULAR;
+
+  const endpoints = React.useMemo(() => ({
+    default: '/v1/ENDPOINT_DEFAULT.json',
+  }), []);
+
+  const getColumnsListado = React.useCallback(({ defaultColumnRender }: { defaultColumnRender?: (_: string, record: NOMBRE_MODELO) => React.ReactNode } = {}): TablaQueryColumnsType<NOMBRE_MODELO>[] => {
+    return [
+      {
+        title: '',
+        dataIndex: 'id',
+        width: 50,
+        orden: false, //Deshabilita el ordenamiento
+        render: (_, record) => (
+          <ActionsButton
+            onEliminar={() => {
+              http.defaultDelete({
+                modalContent: <p>¿Está seguro de querer eliminar el registro?</p>,
+                requestParams: {
+                  endpoint: endpoints.default,
+                  params: { id: record.id },
+                }
+              })
+            }}
+          />
+        )
+      },
+      //...PROPS
+    ]
+  }, [http, endpoints]);
+
+  const getQueryProps = React.useCallback((queryProps: Partial<QueryProps>) => ({
+    ...queryProps,
+    endpoint: queryProps.endpoint ?? endpoints.default,
+  }), [endpoints]);
+
+  return {
+    rutaBase,
+    rutaDetalle,
+    nombrePlural,
+    nombreSingular,
+    endpoints,
+    getColumnsListado,
+    getQueryProps
+  };
+}

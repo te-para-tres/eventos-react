@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "legaliza-sonora"
+  },
+  "targets": {
+    "legaliza-sonora": {
+      "hosting": {
+        "prod": [
+          "eventos-congresoson"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
