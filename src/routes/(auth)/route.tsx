@@ -10,8 +10,8 @@ import { useTheme } from "@base/hooks/useTheme/useTheme";
 import VITE_ENV from "@/config/constants/vite-env";
 import { useLocalApp } from "@base/hooks/useLocalApp/useLocalApp";
 
-import logo from "@/assets/logo_white.png";
-import logo_sm from "@/assets/logo_white.png"; // TODO: AGREGAR LOGO SM
+import logo from "@/assets/logo.png";
+import logo_sm from "@/assets/logo.png"; // TODO: AGREGAR LOGO SM
 import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { RutaAutenticada } from "@/components/validators/RutaAutenticada";
 import { AuthenticatedLayout } from "@base/components/layout/authenticated-layout/authenticated-layout";
@@ -35,7 +35,7 @@ function RouteComponent() {
             <UserOutlined /> Mi Perfil
           </span>
         ),
-        onClick: () => navigate({ to: "/mi-perfil" }),
+        onClick: () => navigate({ to: "/perfil" }),
       },
       {
         key: "2",

@@ -74,26 +74,34 @@ const theme: ThemeConfig = {
     },
 
     Input: {
-      // Inputs con bordes sutiles
       controlHeight: 36,
       borderRadius: 6,
       colorBorder: "#e4e4e7",
       colorBgContainer: "#ffffff",
-      activeShadow: "0 0 0 2px rgba(9, 9, 11, 0.1)",
+      colorTextPlaceholder: "#a1a1aa",
+      activeBorderColor: "#09090b",
+      hoverBorderColor: "#a1a1aa",
+      activeShadow: "0 0 0 3px rgba(9, 9, 11, 0.1)",
     },
     InputNumber: {
       controlHeight: 36,
       borderRadius: 6,
       colorBorder: "#e4e4e7",
       colorBgContainer: "#ffffff",
-      activeShadow: "0 0 0 2px rgba(9, 9, 11, 0.1)",
+      colorTextPlaceholder: "#a1a1aa",
+      activeBorderColor: "#09090b",
+      hoverBorderColor: "#a1a1aa",
+      activeShadow: "0 0 0 3px rgba(9, 9, 11, 0.1)",
     },
     Select: {
-      colorBorder: "transparent",
-      borderRadius: 0,
-      activeBorderColor: "#1890ff",
-      hoverBorderColor: "rgba(0, 0, 0, 0.65)",
-      colorBgContainer: "transparent",
+      colorBorder: "#e4e4e7",
+      borderRadius: 6,
+      activeBorderColor: "#09090b",
+      hoverBorderColor: "#a1a1aa",
+      colorBgContainer: "#ffffff",
+      optionSelectedBg: "#f4f4f5",
+      optionActiveBg: "#f4f4f5",
+      selectorBg: "#ffffff",
     },
     Card: {
       borderRadius: 8,
@@ -151,22 +159,22 @@ const theme: ThemeConfig = {
       colorPrimaryHover: "#18181b",
     },
     DatePicker: {
-      // DatePicker con estilo shadcn
       controlHeight: 36,
       borderRadius: 6,
       colorBorder: "#e4e4e7",
       colorBgContainer: "#ffffff",
-      activeShadow: "0 0 0 2px rgba(9, 9, 11, 0.1)",
-      // Estilos del panel/dropdown
+      activeShadow: "0 0 0 3px rgba(9, 9, 11, 0.1)",
+      activeBorderColor: "#09090b",
+      hoverBorderColor: "#a1a1aa",
+      
+      // Panel/dropdown
       cellActiveWithRangeBg: "#f4f4f5",
       cellHoverBg: "#f4f4f5",
       cellHoverWithRangeBg: "#e4e4e7",
       colorPrimary: "#09090b",
       colorPrimaryBorder: "#09090b",
-      // Header del calendario
       colorIcon: "#71717a",
       colorIconHover: "#09090b",
-      // Celdas seleccionadas
       controlItemBgActive: "#09090b",
       colorTextLightSolid: "#ffffff",
     },
@@ -174,10 +182,12 @@ const theme: ThemeConfig = {
       borderRadius: 4,
       colorPrimary: "#09090b",
       colorPrimaryHover: "#18181b",
+      colorBorder: "#e4e4e7",
     },
-
     Radio: {
       colorPrimary: "#09090b",
+      colorPrimaryHover: "#18181b",
+      colorBorder: "#e4e4e7",
     },
     Alert: {
       borderRadius: 6,

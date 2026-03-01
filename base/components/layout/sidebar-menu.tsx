@@ -1,7 +1,7 @@
-import { ArrowLeftOutlined, UserOutlined } from "@ant-design/icons";
+import { DownOutlined, RightOutlined } from "@ant-design/icons";
 import { LocalMenuItem } from "@base/hooks/useLocalApp/useLocalApp";
 import { useNavigate } from "@tanstack/react-router";
-import { Card, Tooltip } from "antd";
+import { Tooltip } from "antd";
 import { ItemType, MenuItemType } from "antd/lib/menu/interface";
 import { useEffect, useState } from "react";
 
@@ -12,125 +12,76 @@ export interface SidebarMenuProps {
 }
 
 export function SidebarMenu({ menu, activeKeys, collapsed }: SidebarMenuProps) {
-  const [menuItems, setMenuItems] = useState<any[]>(menu);
-  const [currentParent, setCurrentParent] = useState<any>(null);
   const navigate = useNavigate();
-
-  const handleBackClick = () => {
-    setMenuItems(menu);
-    setCurrentParent(null);
-  };
-
-  const selectParent = (item: any) => {
-    setCurrentParent(item);
-    setMenuItems(item?.children);
-  };
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 
   useEffect(() => {
-    if (menu && activeKeys && activeKeys.length > 0) {
-      let foundParent = null;
-      const _menu: LocalMenuItem[] = menu as LocalMenuItem[];
-      for (const item of _menu) {
-        if (activeKeys.includes(item?.key) && item?.children) {
-          foundParent = item;
-          setMenuItems(item?.children);
-          setCurrentParent(item);
-          break;
-        }
+    const _menu = menu as LocalMenuItem[];
+    const toExpand: string[] = [];
+    for (const item of _menu) {
+      if (item?.children && item.children.some((c: any) => activeKeys.includes(c.key))) {
+        toExpand.push(item.key);
       }
-
-      if (!foundParent) {
-        setMenuItems(menu);
-        setCurrentParent(null);
-      }
-    } else {
-      setMenuItems(menu);
-      setCurrentParent(null);
     }
+    setExpandedKeys(toExpand);
   }, [activeKeys, menu]);
 
-  return (
-    <div
-      className={
-        collapsed
-          ? "w-full grid grid-cols-1 p-1"
-          : "w-full grid grid-cols-2 p-1"
-      }
-    >
-      {menuItems.map((item: LocalMenuItem,i) => {
-        const isSelected = activeKeys?.includes(item?.key);
-        const isParent = !!item?.children;
-        return (
-          <Tooltip
-            title={collapsed ? item?.label : ""}
-            color="black"
-            placement="right"
-            key={i}
+  const toggleExpand = (key: string) => {
+    setExpandedKeys((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
+  
+
+  const renderItem = (item: LocalMenuItem, depth = 0) => {
+    const isSelected = activeKeys?.includes(item.key);
+    const isParent = !!item.children && item.children.length > 0;
+    const isExpanded = expandedKeys.includes(item.key);
+
+    return (
+      <div key={item.key}>
+        <Tooltip title={collapsed ? item.label : ""} color="black" placement="right">
+          <div
+            className={`flex items-center gap-3 py-2 cursor-pointer transition-all duration-200 border-l-2
+              ${depth > 0 ? "pl-10" : "pl-3"}
+              ${isSelected
+                ? "text-[#810d48] border-[#810d48] bg-pink-50 font-medium"
+                : "border-transparent hover:bg-neutral-100 hover:text-[#810d48]"
+              }
+            `}
+            onClick={() => {
+              if (isParent) {
+                toggleExpand(item.key);
+              } else {
+                navigate({ to: item.key as string });
+              }
+            }}
           >
-            <Card
-              key={item?.key}
-              hoverable={collapsed ? false : true}
-              onClick={() =>
-                isParent ? selectParent(item) : navigate({ to: item?.key })
-              }
-              styles={{ body: { padding: 2 } }}
-              className={`${
-                isSelected
-                  ? "col-span-1 bg-none border transition-all duration-300 h  border-[#810d48] bg-neutral-50"
-                  : "col-span-1 bg-none border rounded-none border-transparent bg-neutral-50"
-              }
-                    m-2`}
-            >
-              <div className="w-full flex flex-col items-center">
-                <div
-                  className={`
-                    ${isSelected ? "text-[#810d48]" : ""}
-                    ${collapsed ? "text-4xl transition-all duration-300 hover:text-[#810d48] hover:font-bold" : "text-4xl"}`}
-                >
-                  {item?.icon}
-                </div>
-                {!collapsed && (
-                  <div className="w-full ">
-                    <p
-                      className={`text-sm text-center wrap-break-word ${isSelected ? "text-[#810d48]" : ""}`}
-                    >
-                      {item?.label}
-                    </p>
-                  </div>
+            <span className="text-xl flex-shrink-0">{item.icon}</span>
+            {!collapsed && (
+              <>
+                <span className="flex-1">{item.label}</span>
+                {isParent && (
+                  <span className="text-xs pr-3">
+                    {isExpanded ? <DownOutlined /> : <RightOutlined />}
+                  </span>
                 )}
-              </div>
-            </Card>
-          </Tooltip>
-        );
-      })}
-      {currentParent && (
-        <Card
-          hoverable
-          onClick={handleBackClick}
-          styles={{ body: { padding: 2 } }}
-          className={`${collapsed ? "col-span-1" : "col-span-2"}
-            " bg-none border border-neutral-200 bg-neutral-50 rounded-none my-1`}
-        >
-          <div className="w-full flex flex-col items-center">
-            <div className="text-lg">
-              <ArrowLeftOutlined />
-            </div>
+              </>
+            )}
           </div>
-        </Card>
-      )}
-      <Card
-        hoverable
-        onClick={() => navigate({ to: "/perfil" })}
-        styles={{ body: { padding: 2 } }}
-        className={`${collapsed ? "col-span-1" : "col-span-2"}
-            " bg-none bg-neutral-50 rounded-none my-1`}
-      >
-        <div className="w-full flex flex-col items-center">
-          <div className="text-lg">
-            <UserOutlined /> Perfil
+        </Tooltip>
+        {isParent && isExpanded && !collapsed && (
+          <div>
+            {(item.children as LocalMenuItem[]).map((child) => renderItem(child, depth + 1))}
           </div>
-        </div>
-      </Card>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="w-full flex flex-col">
+      {(menu as LocalMenuItem[]).map((item) => renderItem(item))}
     </div>
   );
 }

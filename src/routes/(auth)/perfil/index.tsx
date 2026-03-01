@@ -1,36 +1,20 @@
-//import { PerfilUsuario /*as ModeloBase*/ } from "@/app/models/Perfil.model";
 import { useAuth } from "@/hooks/useAuth/useAuth";
 import { createFileRoute } from "@tanstack/react-router";
 import { DefaultContainer } from "@base/components/layout/containers/DefaultContainer";
-import { CrudHeader } from "@base/components/layout/crud/CrudHeader";
-import { Perfil as ModelClass } from "@/models/Perfil.model";
-
 import {
   Avatar,
   Button,
   Card,
-  Col,
   Form,
-  Image,
-  Input,
-  Popconfirm,
-  QRCode,
-  Row,
   Tag,
   Typography,
 } from "antd";
-//import { Usuario } from "@/models/Usuario.model";
 import {
-  UserOutlined,
   MailOutlined,
   PhoneOutlined,
-  EditFilled,
-  QrcodeOutlined,
   SmileFilled,
+  LogoutOutlined,
 } from "@ant-design/icons";
-import { usePagina } from "@base/hooks/usePagina/usePagina";
-import { useState } from "react";
-import useHttp from "@base/hooks/useHttp/useHttp";
 import { useForm } from "antd/es/form/Form";
 
 export const Route = createFileRoute("/(auth)/perfil/")({
@@ -38,189 +22,53 @@ export const Route = createFileRoute("/(auth)/perfil/")({
 });
 
 function RouteComponent() {
-  const { usuario, refrescarUsuario } = useAuth();
-  const { navigate } = usePagina();
-  const [qrUrl, setQrUrl] = useState<string | null>(null);
-  const [confirmado, setConfirmado] = useState(false);
+  const { usuario, logout } = useAuth();
   const [form] = useForm();
 
-  const { get, post } = useHttp();
-
-  const handleEditar = () => {
-    navigate({
-      to: `${ModelClass.BASE_ROUTE}/detalle`,
-    });
-  };
-
-  const getQr = async () => {
-    try {
-      await get({
-        endpoint: "admin/usuario/generate-qr.json",
-        onSuccess: (data) => {
-          if (data?.detalle) {
-            setQrUrl(data?.detalle);
-          }
-        },
-      });
-    } catch (e) {
-      return e;
-    }
-  };
-
-  const postCodigo = async () => {
-    const values = await form.validateFields();
-
-    try {
-      await post({
-        endpoint: "admin/usuario/verify.json",
-        body: values,
-        onSuccess: () => {
-          setConfirmado(true);
-        },
-      });
-    } catch (e) {
-      return e;
-    }
-  };
-
-  const desacctivarTotp = async () => {
-    try {
-      await post({
-        endpoint: "admin/usuario/disable-totp.json",
-        onSuccess: () => {
-          refrescarUsuario();
-        },
-      });
-    } catch (e) {
-      return e;
-    }
-  };
 
   return (
-    <DefaultContainer className="h-full w-full flex flex-row align-middle justify-center items-center">
-      <Card className="h-4/5 w-4/5">
+    <DefaultContainer className="h-full w-full flex flex-col justify-start items-center pt-10">
+      <Card className="w-full max-w-3xl">
         <Form form={form}>
-          <Row gutter={[24, 16]}>
-            <div className="mx-auto w-full p-6 flex flex-col gap-6">
-              <section className="flex gap-2 text-2xl font-semibold">
-                Perfil
-              </section>
-              <section className="flex flex-col gap-2">
-                <div className="flex flex-row gap-2">
-                  <Avatar
-                    size={128}
-                    icon={<SmileFilled />}
-                    className="bg-[#d58145] text-white"
-                    src={usuario?.foto}
-                  />
-                  <div>
-                    <Typography.Title level={3}>
-                      {usuario?.getNombreCompleto()}
-                    </Typography.Title>
-                    <Tag color="orange">{usuario?.rol}</Tag>
-                  </div>
-                  <div className="ml-10 border border-neutral-200 p-2 rounded-md w-2/3">
-                    <section>
-                      <Typography.Title level={5} className="mb-2">
-                        Contácto
-                      </Typography.Title>
-                      <div className="flex flex-col gap-1">
-                        <span className="flex items-center gap-2 text-neutral-700">
-                          <MailOutlined /> {usuario?.correo}
-                        </span>
-                        <span className="flex items-center gap-2 text-neutral-700">
-                          <PhoneOutlined />{" "}
-                          {usuario?.telefono
-                            ? usuario?.telefono
-                            : "No disponible"}
-                        </span>
-                      </div>
-                    </section>
-                  </div>
-                </div>
-              </section>
+          <div className="flex flex-col gap-6">
+            <section className="flex items-center gap-4 pb-5 border-b border-neutral-200">
+              <Avatar
+                size={80}
+                icon={<SmileFilled />}
+                className="bg-[#d58145] text-white shrink-0"
+                src={usuario?.foto}
+              />
+              <div className="flex flex-col gap-1">
+                <Typography.Title level={3} style={{ margin: 0 }}>
+                  {usuario?.getNombreCompleto()}
+                </Typography.Title>
+                <Tag color="orange" style={{ width: "fit-content" }}>
+                  {usuario?.rol}
+                </Tag>
+              </div>
+            </section>
 
-              {!usuario?.otp && !qrUrl && (
-                <section>
-                  <Typography.Title level={5} className="mb-2">
-                    Códgio de Verificación
-                  </Typography.Title>
-                  <div className="flex flex-col gap-1">
-                    <Button
-                      type="primary"
-                      size="large"
-                      icon={<QrcodeOutlined />}
-                      onClick={getQr}
-                    >
-                      Activar Código
-                    </Button>
-                  </div>
-                </section>
-              )}
-              {qrUrl && !usuario?.otp && !confirmado && (
-                <section>
-                  <Typography.Title level={5} className="mb-2">
-                    Escanee su QR e ingrese el codigo
-                  </Typography.Title>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex flex-row justify-center">
-                      <Image src={qrUrl} preview={false} />
-                    </div>
-                    <div className="flex flex-row justify-center">
-                      <Form.Item name={"codigo"} required>
-                        <Input.OTP length={6} />
-                      </Form.Item>
-                    </div>
-                    <div className="flex flex-row justify-center">
-                      <Button type="primary" size="large" onClick={postCodigo}>
-                        Confirmar
-                      </Button>
-                    </div>
-                  </div>
-                </section>
-              )}
-              {confirmado && (
-                <section>
-                  <Typography.Title level={5} className="mb-2">
-                    Su codigo ha sido confirmado
-                  </Typography.Title>
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      type="primary"
-                      size="large"
-                      onClick={refrescarUsuario}
-                    >
-                      Continuar
-                    </Button>
-                  </div>
-                </section>
-              )}
-              {usuario?.otp && !qrUrl && (
-                <section>
-                  <Typography.Title level={5} className="mb-2">
-                    Códgio de Verificación
-                  </Typography.Title>
-                  <div className="flex flex-col gap-1">
-                    <Popconfirm
-                      title="¿Eliminar documento?"
-                      onConfirm={desacctivarTotp}
-                      okText="Sí"
-                      cancelText="No"
-                    >
-                      <Button
-                        type="primary"
-                        size="large"
-                        icon={<QrcodeOutlined />}
-                        danger
-                      >
-                        Desactivar Código
-                      </Button>
-                    </Popconfirm>
-                  </div>
-                </section>
-              )}
+            <div className="flex justify-center items-center flex-row gap-6 w-full h-auto">
+              <section className="flex flex-col justify-between items-center gap-3 flex-1 border border-neutral-200 rounded-lg p-4 w-full h-auto max-w-xl">
+                <Typography.Title level={5} style={{ margin: 0, }}>
+                  <MailOutlined className="mr-2 text-neutral-400" />
+                  Contacto
+                </Typography.Title>
+                <div className="flex flex-col gap-2 text-neutral-600">
+                  <span className="flex items-center gap-2">
+                    <MailOutlined /> {usuario?.correo}
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <PhoneOutlined />
+                    {usuario?.telefono ?? "No disponible"}
+                  </span>
+                </div>
+                <Button icon={<LogoutOutlined />} danger onClick={() => logout()} className="w-full mt-6">
+                  Cerrar sesión
+                </Button>
+              </section>
             </div>
-          </Row>
+          </div>
         </Form>
       </Card>
     </DefaultContainer>

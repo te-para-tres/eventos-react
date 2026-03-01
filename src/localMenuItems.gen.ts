@@ -8,18 +8,7 @@ const local_menu_items: LocalMenuItem[] = [
     icon: "ant-design:home-outlined",
     visible: true,
   },
-  {
-    key: "/asistencia",
-    label: "Asistencia",
-    icon: "lucide:user-round-check",
-    visible: true,
-  },
-  {
-    key: "/catalogos",
-    label: "Catálogos",
-    icon: "lucide:list-plus",
-    visible: true,
-  },
+
   {
     key: "/eventos",
     label: "Eventos",

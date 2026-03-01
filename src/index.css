@@ -1,5 +1,7 @@
-@layer theme, base, antd, components, utilities; /* antd + tailwindcss compatibility https://ant.design/docs/react/compatible-style#tailwindcss-v4*/
-@import "tailwindcss"; /* Tailwind 4 https://tailwindcss.com/docs/styling-with-utility-classes*/
+@layer theme, base, antd, components, utilities;
+/* antd + tailwindcss compatibility https://ant.design/docs/react/compatible-style#tailwindcss-v4*/
+@import "tailwindcss";
+/* Tailwind 4 https://tailwindcss.com/docs/styling-with-utility-classes*/
 
 .sider-logo {
   display: flex;
@@ -17,6 +19,7 @@
 .ant-form-item-label {
   padding-bottom: 0 !important;
 }
+
 .ant-form-item {
   margin-bottom: 0;
 }
@@ -53,68 +56,74 @@
   background-color: #ffffff;
 }
 
-/* Sobrescribir estilos de todos los inputs */
 .ant-input,
 .ant-input-affix-wrapper {
+  border: 1px solid #e4e4e7 !important;
+  background-color: #ffffff !important;
+  border-radius: 6px;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  color: #09090b !important;
+  transition: border-color 0.15s, box-shadow 0.15s !important;
+}
+
+.ant-input-affix-wrapper .ant-input {
   border: none !important;
-  background-color: transparent;
-  border-bottom: 1px solid #d9d9d9 !important;
-  border-radius: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+  font-size: 14px !important;
+}
+
+.ant-input::placeholder,
+.ant-input-affix-wrapper input::placeholder {
+  color: #a1a1aa !important;
 }
 
 .ant-input:hover,
 .ant-input-affix-wrapper:hover {
-  border-bottom-color: rgba(0, 0, 0, 0.65) !important;
+  border-color: #a1a1aa !important;
 }
 
 .ant-input:focus,
 .ant-input-focused,
 .ant-input-affix-wrapper-focused {
-  border-bottom-color: #242424 !important;
-  border-bottom-width: 1px !important;
-  box-shadow: none !important;
+  border-color: #09090b !important;
+  box-shadow: 0 0 0 3px rgba(9, 9, 11, 0.1) !important;
+  outline: none !important;
 }
 
-/* Para inputs deshabilitados */
+/* Input deshabilitado */
 .ant-input:disabled,
 .ant-input-affix-wrapper-disabled {
-  border-bottom-style: dashed !important;
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+  background-color: #fafafa !important;
 }
 
+/* Select - estilo ShadCN */
 .ant-select .ant-select-selector {
-  border: none !important;
-  border-bottom: 1px solid #d9d9d9 !important;
-  border-radius: 0 !important;
-  padding-left: 0 !important;
-  box-shadow: none !important;
+  border: 1px solid #e4e4e7 !important;
+  background-color: #ffffff !important;
+  border-radius: 6px !important;
+  transition: border-color 0.15s, box-shadow 0.15s !important;
 }
 
 .ant-select:hover .ant-select-selector {
-  border-bottom-color: rgba(0, 0, 0, 0.65) !important;
+  border-color: #a1a1aa !important;
 }
 
 .ant-select-focused .ant-select-selector,
 .ant-select-open .ant-select-selector {
-  border-bottom-color: #242424 !important;
-  border-bottom-width: 1px !important;
-  box-shadow: none !important;
+  border-color: #09090b !important;
+  box-shadow: 0 0 0 3px rgba(9, 9, 11, 0.1) !important;
 }
 
-/* Para Select deshabilitado */
+/* Select deshabilitado */
 .ant-select-disabled .ant-select-selector {
-  border-bottom-style: dashed !important;
-}
-
-/* Ajustar padding del contenido del Select */
-.ant-select-single .ant-select-selector .ant-select-selection-search {
-  left: 0 !important;
-}
-
-.ant-select-single .ant-select-selector .ant-select-selection-item,
-.ant-select-single .ant-select-selector .ant-select-selection-placeholder {
-  padding-left: 0 !important;
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+  background-color: #fafafa !important;
 }
 
 .ant-menu-item-selected {
@@ -127,7 +136,7 @@
 }
 
 /* SubMenu item seleccionado */
-.ant-menu-submenu-selected > .ant-menu-submenu-title {
+.ant-menu-submenu-selected>.ant-menu-submenu-title {
   border-bottom: 1px solid #242424 !important;
   color: #242424 !important;
 }
@@ -137,52 +146,33 @@
   border-bottom: 1px solid #242424 !important;
 }
 
-.ant-picker {
-  border: none !important;
-  border-bottom: 1px solid #d9d9d9 !important;
-  border-radius: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  box-shadow: none !important;
+/* DatePicker / RangePicker - estilo ShadCN */
+.ant-picker,
+.ant-picker-range {
+  border: 1px solid #e4e4e7 !important;
+  background-color: #ffffff !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  transition: border-color 0.15s, box-shadow 0.15s !important;
 }
 
-.ant-picker:hover {
-  border-bottom-color: rgba(0, 0, 0, 0.65) !important;
+.ant-picker:hover,
+.ant-picker-range:hover {
+  border-color: #a1a1aa !important;
 }
 
-.ant-picker-focused {
-  border-bottom-color: #242424 !important;
-  border-bottom-width: 1px !important;
-  box-shadow: none !important;
+.ant-picker-focused,
+.ant-picker-range.ant-picker-focused {
+  border-color: #09090b !important;
+  box-shadow: 0 0 0 3px rgba(9, 9, 11, 0.1) !important;
+  outline: none !important;
 }
 
 /* DatePicker deshabilitado */
 .ant-picker-disabled {
-  border-bottom-style: dashed !important;
-}
-
-/* Ajustar padding interno del DatePicker */
-.ant-picker .ant-picker-input > input {
-  padding-left: 0 !important;
-}
-
-/* RangePicker - mismo estilo */
-.ant-picker-range {
-  border: none !important;
-  border-bottom: 1px solid #d9d9d9 !important;
-  border-radius: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-
-.ant-picker-range:hover {
-  border-bottom-color: rgba(0, 0, 0, 0.65) !important;
-}
-
-.ant-picker-range.ant-picker-focused {
-  border-bottom-color: #242424 !important;
-  border-bottom-width: 1px !important;
-  box-shadow: none !important;
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+  background-color: #fafafa !important;
 }
 
 .ant-menu-item-selected {
@@ -195,7 +185,7 @@
 }
 
 /* SubMenu item seleccionado */
-.ant-menu-submenu-selected > .ant-menu-submenu-title {
+.ant-menu-submenu-selected>.ant-menu-submenu-title {
   border-bottom: 1px solid #242424 !important;
   color: #242424 !important;
 }
@@ -205,25 +195,43 @@
   border-bottom: 1px solid #242424 !important;
 }
 
+/* InputNumber - estilo ShadCN */
 .ant-input-number,
 .ant-input-number-affix-wrapper {
-  border: none !important;
-  background-color: transparent;
-  border-bottom: 1px solid #d9d9d9 !important;
-  border-radius: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+  border: 1px solid #e4e4e7 !important;
+  background-color: #ffffff !important;
+  border-radius: 6px !important;
+  padding: 2px;
+  text-align: center;
+  font-size: 14px !important;
+  color: #09090b !important;
+  transition: border-color 0.15s, box-shadow 0.15s !important;
 }
 
 .ant-input-number:hover,
 .ant-input-number-affix-wrapper:hover {
-  border-bottom-color: rgba(0, 0, 0, 0.65) !important;
+  border-color: #a1a1aa !important;
 }
 
 .ant-input-number:focus,
 .ant-input-number-focused,
 .ant-input-number-affix-wrapper-focused {
-  border-bottom-color: #242424 !important;
-  border-bottom-width: 1px !important;
-  box-shadow: none !important;
+  border-color: #09090b !important;
+  box-shadow: 0 0 0 3px rgba(9, 9, 11, 0.1) !important;
+  outline: none !important;
+}
+
+/* InputNumber deshabilitado */
+.ant-input-number-disabled,
+.ant-input-number-affix-wrapper-disabled {
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+  background-color: #fafafa !important;
+}
+
+.ant-form-item-label > label {
+  font-size: 15px;
+  font-weight: 500;
+  color: "#09090b";
+  padding-bottom: 6px;
 }

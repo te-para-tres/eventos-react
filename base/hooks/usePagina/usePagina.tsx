@@ -77,7 +77,7 @@ export function PaginaProvider({
         breadcrumbs.push({
           // TODO: OBTENER EL ICONO DE CURRENT_MENU DE LOCAL APP
           title: (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2  hover:bg-stone-100">
               {obtenerIconoMenuByKey(currentPath)}{" "}
               {obtenerMenuLabelByKey(currentPath) ?? label}
             </div>

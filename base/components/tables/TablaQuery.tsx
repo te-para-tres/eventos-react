@@ -80,6 +80,9 @@ export function TablaQuery<T = any>({
       size: "small",
       pageSizeOptions: [10, 25, 50, 100],
       align: "end",
+      style: {
+        paddingRight: "10px" 
+      },
       onChange(current, pageSize) {
         setRequestParams((prev: IRequestParams) => ({
           ...prev,

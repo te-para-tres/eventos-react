@@ -18,87 +18,80 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="h-screen flex flex-row justify-between">
-      <div className="w-1/2 h-full bg-[#242424]"></div>
-      <div className="h-full w-1/2 p-4 flex items-center justify-center">
-        <div className="w-3/4 h-3/4 flex flex-col">
-          <div className="h-1/4">
-            <h1 className="text-6xl  font-semibold">Iniciar Sesión</h1>
+    <div className="h-screen flex">
+      <div className="hidden lg:flex w-1/2 h-full bg-[#242424] flex-col justify-between p-10">
+        <div className="text-white text-xl font-semibold tracking-tight">
+          EventosApp
+        </div>
+        <div className="text-neutral-400 text-sm">
+          © {new Date().getFullYear()} EventosApp. Todos los derechos reservados.
+        </div>
+      </div>
+
+      <div className="flex-1 h-full flex items-center justify-center bg-white p-8">
+        <div className="w-full max-w-lg flex flex-col gap-6">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-4xl font-semibold text-neutral-900">
+              Iniciar sesión
+            </h1>
+            <p className="text-lg text-neutral-500">
+              Ingresa tus credenciales para continuar
+            </p>
           </div>
-          <div className="h-3/4">
-            <Spin spinning={isIniciandoSesion}>
-              <Form
-                name="normal_login"
-                className="login-form"
-                layout="vertical"
-                initialValues={{
-                  remember: false,
-                }}
-                onFinish={login}
-              >
-                <Row gutter={[10, 30]}>
-                  <Col span={24}>
-                    <Form.Item
-                      name="usuario"
-                      label="Usuario"
-                      rules={[
-                        AntdFormValidation.Requerido("Usuario es requerido"),
-                      ]}
+
+          <Spin spinning={isIniciandoSesion}>
+            <Form
+              name="normal_login"
+              layout="vertical"
+              initialValues={{ remember: false }}
+              onFinish={login}
+            >
+              <Row gutter={[0, 4]}>
+                <Col span={24}>
+                  <Form.Item
+                    name="usuario"
+                    label="Usuario"
+                    rules={[AntdFormValidation.Requerido("Usuario es requerido")]}
+                  >
+                    <Input
+                      prefix={<UserOutlined className="text-neutral-400" />}
+                      size="large"
+                      placeholder="correo@ejemplo.com"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={24} className="mt-4">
+                  <Form.Item
+                    name="clave"
+                    label="Contraseña"
+                    rules={[
+                      AntdFormValidation.Requerido("La contraseña es requerida"),
+                      AntdFormValidation.LongitudMinima(4, "Mínimo 4 caracteres"),
+                    ]}
+                  >
+                    <Input.Password
+                      prefix={<LockOutlined className="text-neutral-400" />}
+                      size="large"
+                      autoComplete="off"
+                      placeholder="••••••••"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={24} className="mt-4">
+                  <Form.Item style={{ marginBottom: 0 }}>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      block
+                      size="large"
                     >
-                      <Input
-                        prefix={
-                          <UserOutlined className="site-form-item-icon" />
-                        }
-                        variant="filled"
-                        size="large"
-                        placeholder="correo@ejemplo.com"
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col span={24}>
-                    <Form.Item
-                      name="clave"
-                      label="Contraseña"
-                      rules={[
-                        AntdFormValidation.Requerido(
-                          "La contraseña es requerida"
-                        ),
-                        AntdFormValidation.LongitudMinima(
-                          4,
-                          "La contraseña debe tener al menos 4 caracteres"
-                        ),
-                      ]}
-                    >
-                      <Input.Password
-                        variant="filled"
-                        prefix={
-                          <LockOutlined className="site-form-item-icon" />
-                        }
-                        size="large"
-                        type="new-password"
-                        autoComplete="off"
-                        autoCorrect="off"
-                        placeholder="Contraseña"
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col span={24}>
-                    <Form.Item>
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        block
-                        size="large"
-                        className="login-form-button"
-                      >
-                        Ingresar
-                      </Button>
-                    </Form.Item>
-                  </Col>
-                </Row>
-              </Form>
-            </Spin>
-          </div>
+                      Ingresar
+                    </Button>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Form>
+          </Spin>
         </div>
       </div>
     </div>

@@ -10,8 +10,10 @@ import {
 import { ItemType, MenuItemType } from "antd/lib/menu/interface";
 import { SidebarMenu } from "../sidebar-menu";
 import React from "react";
-import { UserOutlined } from "@ant-design/icons";
+import { LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined } from "@ant-design/icons";
 import { BreadcrumbItemType } from "antd/lib/breadcrumb/Breadcrumb";
+import UserNavOptions from "../user-nav-options";
+import { useAuth } from "@/hooks/useAuth/useAuth";
 
 export interface AuthenticatedLayoutProps {
   children: React.ReactNode;
@@ -41,6 +43,7 @@ export function AuthenticatedLayout({
   logoRender,
 }: AuthenticatedLayoutProps) {
   const [collapsed, setCollapsed] = React.useState(false);
+  const { logout } = useAuth();
 
   if (ocultarLayout) {
     return <>{children}</>;
@@ -59,6 +62,7 @@ export function AuthenticatedLayout({
         className="border-r border-r-neutral-200"
         style={{
           minHeight: "100vh",
+          padding: "4px"
         }}
       >
         <div className="h-full w-full flex flex-col">
@@ -73,44 +77,80 @@ export function AuthenticatedLayout({
                   paddingRight: "8px",
                 }}
               >
-                <Avatar
-                  icon={<UserOutlined />}
-                  style={{ border: "1px solid black", color: "black" }}
-                />
               </Button>
             </div>
-            {!collapsed && (
-              <div className="flex flex-col justify-center align-bottom">
-                <div className="text-md text-black font-bold bold">
-                  {usuario?.nombre ?? ""} {usuario?.apellidos ?? ""}
-                </div>
-                <div className="text-sm text-black">{usuario?.correo}</div>
-              </div>
-            )}
+            <div className="flex flex-col justify-center align-bottom">
+              {logoRender(collapsed)}
+            </div>
+
           </div>
           <div className="w-full">
             <SidebarMenu
-            collapsed={collapsed}
+              collapsed={collapsed}
               menu={sidebarMenuItems}
               activeKeys={activeKeys ?? []}
             />
           </div>
-          <div
-            className="w-full flex flex-row justify-center"
-            style={{
-              padding: "2px 0",
-            }}
-          >
-            {/* <LogoIcon /> */}
+          <div className="flex p-2 mt-auto">
+            <Button icon={<LogoutOutlined />} onClick={() => logout()} danger className="w-full">
+              Cerrar sesión
+            </Button>
           </div>
         </div>
       </Layout.Sider>
       <Layout>
+        {!ocultarBreadcrumb && (
+          <Layout.Header
+            style={{
+              padding: 0,
+              background: "#F8F8F8",
+              borderBottom: "1px solid #E1E1E1",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              height: 64,
+              top: 0,
+              zIndex: 1,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <Button
+                type="text"
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={() => setCollapsed(!collapsed)}
+                style={{
+                  fontSize: "16px",
+                  width: 64,
+                  height: 64,
+                }}
+                className="hover:bg-stone-100"
+              />
+              {!ocultarBreadcrumb && (
+                <Breadcrumb
+                  style={{ margin: "0 0.8rem" }}
+                  items={breadcrumbItems}
+                />
+              )}
+            </div>
+            <UserNavOptions
+              tituloRender={
+                <div className="text-sm text-[#000000E0] bold text-left">
+                  {usuario?.nombre} {usuario?.apellidos}
+                </div>
+              }
+              subtituloRender={
+                <div className="text-sm text-[#000000E0] text-left">
+                  {usuario?.correo}
+                </div>
+              }
+              usuario={usuario}
+              menuItems={userNavMenuItems}
+            />
+          </Layout.Header>
+        )}
         <Layout.Content
-          className="p-4"
           style={{
             margin: "1rem 1rem",
-            flex: 1,
           }}
         >
           {children}

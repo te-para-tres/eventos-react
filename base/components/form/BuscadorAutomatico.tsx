@@ -42,10 +42,10 @@ export default function BuscadorAutomatico({
   }, [updateParams]);
 
   return (
-    <div className="flex flex-wrap gap-2 p-2">
+    <div className="flex flex-wrap gap-2 mb-1">
       <div className={`flex ${responsive && "w-full"}`}>
         <Input
-          size={inputProps?.size ?? "small"}
+          size={inputProps?.size ?? "middle"}
           placeholder={inputProps?.placeholder ?? "Buscar..."}
           value={searchValue}
           onChange={(e) => {
@@ -53,7 +53,7 @@ export default function BuscadorAutomatico({
             debounceSearch(e.target.value);
           }}
           allowClear={false}
-          style={{ borderRadius: "4px 0 0 4px" }}
+          style={{ borderRadius: "6px 0 0 6px" }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               updateParams(searchValue);
@@ -66,8 +66,8 @@ export default function BuscadorAutomatico({
               icon={<SearchOutlined />}
               type="primary"
               style={{
-                borderRadius: "0 4px 4px 0",
-                padding: "0 1rem",
+                borderRadius: "0 6px 6px 0",
+                padding: "1.2rem"
               }}
             />
           </Tooltip>
@@ -79,7 +79,7 @@ export default function BuscadorAutomatico({
           <Tooltip title="Limpiar búsqueda">
             <Button
               icon={<ClearOutlined />}
-              style={{ padding: "0 1rem" }}
+              style={{ padding: "1.2rem" }}
               onClick={clearSearch}
             />
           </Tooltip>

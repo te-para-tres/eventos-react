@@ -50,7 +50,7 @@ export function EdForm({
       initialValues={initialValues}
       layout={props?.layout ?? "vertical"}
       autoComplete={autoComplete ?? "off"}
-      className="p-2 rounded-lg border border-neutral-300"
+      className="p-4 rounded-lg border border-neutral-300"
     >
       {children}
     </AntdForm>

@@ -47,7 +47,7 @@ export default function Formulario({
             name="nombre"
             rules={[AntdFormValidation.Requerido("El nombre es obligatorio")]}
           >
-            <TextInput placeholder="Nombre" />
+            <TextInput placeholder="Nombre"/>
           </Form.Item>
         </Col>
 
