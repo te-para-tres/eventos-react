@@ -8,11 +8,28 @@ const local_menu_items: LocalMenuItem[] = [
     icon: "ant-design:home-outlined",
     visible: true,
   },
-
   {
     key: "/eventos",
     label: "Eventos",
     icon: "lucide:calendar-days",
+    visible: true,
+  },
+  {
+    key: "/unidad-academica",
+    label: "Unidades Academicas",
+    icon: "lucide:building",
+    visible: true,
+  },
+  {
+    key: "/carrera",
+    label: "Carreras",
+    icon: "lucide:book-open-text",
+    visible: true,
+  },
+  {
+    key: "/material",
+    label: "Materiales",
+    icon: "lucide:toolbox",
     visible: true,
   },
   {
