@@ -33,6 +33,12 @@ const local_menu_items: LocalMenuItem[] = [
     visible: true,
   },
   {
+    key: "/categoria",
+    label: "Categorias",
+    icon: "lucide:boxes",
+    visible: true,
+  },
+  {
     key: "/administracion",
     label: "Administración",
     icon: "lucide:shield-user",

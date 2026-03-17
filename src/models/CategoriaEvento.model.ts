@@ -1,33 +1,37 @@
 import { ModelColumnsType } from "@base/interfaces/models/types/model-columns.type";
 import { ModeloBase } from "@base/interfaces/models/modelo-base.model";
+import { Evento } from "./Evento.model";
 
-export class UnidadAcademica extends ModeloBase {
+export class CategoriaEvento extends ModeloBase {
+  clave?: string;
   nombre?: string;
   descripcion?: string;
-  telefono?: string;
-  correo?: string;
-  estado?: string;
+  eventos?: Evento[];
 
-  static CLASS_NAME = 'Unidad Académica';
-  static BASE_ROUTE = "/unidad-academica";
+  static CLASS_NAME = 'Categoría';
+  static BASE_ROUTE = "/categoria";
 
   static ENDPOINTS = {
-    DEFAULT: '/v1/unidad-academica.json',
+    DEFAULT: '/v1/categoria-evento.json',
   };
 
   static EXPAND = {
-    DEFAULT: "carreras,eventos"
+    DEFAULT: "eventos"
   }
 
-  static fromJson(data: Partial<UnidadAcademica>) {
-    return new UnidadAcademica(data);
+  static fromJson(data: Partial<CategoriaEvento>) {
+    return new CategoriaEvento(data);
   }
 
-  static fromJsonList(data: Partial<UnidadAcademica>[]) {
-    return data.map((_data) => new UnidadAcademica(_data));
+  static fromJsonList(data: Partial<CategoriaEvento>[]) {
+    return data.map((_data) => new CategoriaEvento(_data));
   }
 
   static COLUMNS: ModelColumnsType[] = [
+    {
+      key: 'clave',
+      title: 'Clave',
+    },
     {
       key: 'nombre',
       title: 'Nombre',
@@ -35,23 +39,11 @@ export class UnidadAcademica extends ModeloBase {
     {
       key: 'descripcion',
       title: 'Descripción',
-    },
-    {
-      key: 'telefono',
-      title: 'Teléfono',
-    },
-    {
-      key: 'correo',
-      title: 'Correo',
-    },
-    {
-      key: 'estado',
-      title: 'Estado',
-    },
+    }
   ]
   //#endregion
 
-  constructor(json: Partial<UnidadAcademica> = {}) {
+  constructor(json: Partial<CategoriaEvento> = {}) {
     super();
     Object.assign(this, json);
   }
