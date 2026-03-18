@@ -25,6 +25,6 @@ dist-ssr
 /.env.development.local
 /src/routeTree.gen.ts
 /.cursor
-/yarn.lock
+
 /package-lock.json
 /.firebase
