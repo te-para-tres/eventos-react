@@ -66,23 +66,15 @@ export function AuthenticatedLayout({
         }}
       >
         <div className="h-full w-full flex flex-col">
-          <div className="flex p-2 my-2">
-            <div className="h-full flex flex-row align-middle items-center">
-              <Button
-                type="text"
-                onClick={() => setCollapsed((prev) => !prev)}
-                style={{
-                  height: "100%",
-                  paddingLeft: "8px",
-                  paddingRight: "8px",
-                }}
-              >
-              </Button>
-            </div>
-            <div className="flex flex-col justify-center align-bottom">
-              {logoRender(collapsed)}
-            </div>
-
+          <div
+            className="flex items-center justify-center mb-3"
+            style={{
+              height: 60,
+              width: "100%",
+              borderBottom: "1px solid #E1E1E1",
+            }}
+          >
+            {logoRender(collapsed)}
           </div>
           <div className="w-full">
             <SidebarMenu

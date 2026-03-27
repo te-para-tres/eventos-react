@@ -50,8 +50,8 @@ const LoginPage = () => {
                 <Col span={24}>
                   <Form.Item
                     name="usuario"
-                    label="Usuario"
-                    rules={[AntdFormValidation.Requerido("Usuario es requerido")]}
+                    label="Correo"
+                    rules={[AntdFormValidation.Requerido("El correo es requerido")]}
                   >
                     <Input
                       prefix={<UserOutlined className="text-neutral-400" />}

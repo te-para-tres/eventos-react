@@ -1,17 +1,19 @@
 import { ModelColumnsType } from "@base/interfaces/models/types/model-columns.type";
 import { ModeloBase } from "@base/interfaces/models/modelo-base.model";
-import { EventoEmpleado } from "./EventoEmpleado.model";
 
 export class Evento extends ModeloBase {
   nombre?: string;
-  inicio?: string;
-  fin?: string;
   descripcion?: string;
-  ubicacion?: string;
+  fechaInicio?: string;
+  fechaFin?: string;
+  capacidadMaxima?: number;
+  capacidadMinima?: number;
+  estado?: string;
+  lugar?: string;
   latitud?: number;
   longitud?: number;
 
-  eventoEmpleado?: EventoEmpleado;
+
 
   static CLASS_NAME = 'Evento';
   static BASE_ROUTE = "/eventos";
@@ -42,18 +44,22 @@ export class Evento extends ModeloBase {
       title: 'Descripción',
     },
     {
-      key: 'inicio',
+      key: 'fechaInicio',
       title: 'Inicio',
       type: 'date'
     },
     {
-      key: 'fin',
+      key: 'fechaFin',
       title: 'Fin',
       type: 'date'
     },
     {
-      key: 'ubicacion',
-      title: 'Ubicación',
+      key: 'estado',
+      title: 'Estado',
+    },
+    {
+      key: 'capacidadMaxima',
+      title: 'Capacidad',
     },
   ]
   //#endregion

@@ -5,13 +5,11 @@ import {
   Outlet,
   useNavigate,
 } from "@tanstack/react-router";
-import { Image, MenuProps } from "antd";
+import { MenuProps } from "antd";
 import { useTheme } from "@base/hooks/useTheme/useTheme";
 import VITE_ENV from "@/config/constants/vite-env";
 import { useLocalApp } from "@base/hooks/useLocalApp/useLocalApp";
 
-import logo from "@/assets/logo.png";
-import logo_sm from "@/assets/logo.png"; // TODO: AGREGAR LOGO SM
 import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { RutaAutenticada } from "@/components/validators/RutaAutenticada";
 import { AuthenticatedLayout } from "@base/components/layout/authenticated-layout/authenticated-layout";
@@ -58,12 +56,16 @@ function RouteComponent() {
 
   const LogoRender = (collapsed: boolean) => {
     return (
-      <Image
-        src={!collapsed ? logo : logo_sm}
-        className={"w-full"}
-        alt={`logo de ${env.APP_NAME}`}
-        preview={false}
-      />
+      <div className="flex items-center gap-3 px-2 py-1">
+        <span className="bg-[#741A39] text-white text-xs font-bold px-2.5 py-2.5 rounded-lg tracking-widest select-none">
+          UES
+        </span>
+        {!collapsed && (
+          <span className="text-[#741A39] text-lg font-bold tracking-wide">
+            Eventues
+          </span>
+        )}
+      </div>
     );
   };
 

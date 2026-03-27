@@ -5,7 +5,7 @@ import {
   MenuProps,
   theme as antdTheme,
 } from "antd";
-import { ItemType, MenuItemType } from "antd/lib/menu/interface"; 
+import { ItemType, MenuItemType } from "antd/lib/menu/interface";
 import React from "react";
 import { MenuUnfoldOutlined, MenuFoldOutlined } from "@ant-design/icons";
 import { BreadcrumbItemType } from "antd/lib/breadcrumb/Breadcrumb";
