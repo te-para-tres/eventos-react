@@ -157,7 +157,7 @@ const TablaMateriales: React.FC = () => {
                     <TextAreaInput placeholder="Ej. Necesario para el auditorio" />
                   </Form.Item>
                 </Col>
-                <Col span={24}>
+                <Col span={6}>
                   <Button
                     type="primary"
                     htmlType="button"

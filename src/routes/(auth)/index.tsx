@@ -330,7 +330,7 @@ function RouteComponent() {
                             </Button>
                           </Row>
 
-                          <div className="flex flex-col gap-0">
+                          <Col span={24} className="flex flex-col gap-0">
                             <Row className="py-5 border-b border-zinc-50 hover:bg-zinc-50/50 transition-colors px-2 rounded-md">
                               <Col span={8}>
                                 <Typography.Text className="text-zinc-400 font-medium">Título</Typography.Text>
@@ -378,7 +378,61 @@ function RouteComponent() {
                                 )}
                               </Col>
                             </Row>
-                          </div>
+                          </Col>
+                        </Card>
+                        <Card>
+                          <Typography.Title level={4} className="flex items-center m-0 text-zinc-800 mb-4">
+                            <Icon icon={"lucide:link"} className="mr-3 text-[#731C38] text-2xl" />
+                            Flyers Digitales y Anexos
+                          </Typography.Title>
+                          <Typography.Text className="text-zinc-400 mb-4">
+                            Carga el material visual oficial y documentos adicionales (PDF, JPG, PNG)
+                          </Typography.Text>
+
+                          <Form.Item
+                            className="w-full h-auto"
+                            label="Imagen de Portada"
+                            name="idImagenDestacada"
+                          >
+                            <Upload
+                              style={{ width: "100%", height: "auto" }}
+                              showUploadList={false}
+                              multiple
+                              accept="image/*,application/pdf"
+                              name="archivo"
+                            >
+                              <div className="bg-neutral-100 hover:bg-neutral-50 w-auto h-48 p-4 rounded-lg border border-zinc-300 border-dashed cursor-pointer flex flex-col items-center justify-center text-lg text-neutral-950 hover:text-neutral-500 text-center">
+                                <CloudUploadOutlined style={{ fontSize: 50 }} className="text-[#731C38] bg-[#EAE3E8] p-4 rounded-full" />
+                                <Typography.Title level={5} className="text-stone-700 mt-2">
+                                  Haga clic para cargar o arrastre y suelte
+                                </Typography.Title>
+                                <Typography.Text className="text-sm text-stone-500">
+                                  Formato recomendado Vertical (A4 o 1080px). Max 5MB
+                                </Typography.Text>
+                              </div>
+                            </Upload>
+                          </Form.Item>
+                        </Card>
+                      </Col>
+
+                      <Col sm={8} span={24}>
+                        <Card className="w-full h-auto p-6">
+                          <Typography.Title level={4} className="text-zinc-400 mb-4">
+                            Generación de Acceso
+                          </Typography.Title>
+                          <Card className="flex justify-center items-center border-stone-400 bg-stone-50 p-12 w-full h-auto">
+                            <div className="rounded bg-zinc-600"></div>
+                          </Card>
+
+                          <Col span={24}>
+                            <Button icon={<Icon icon={"lucide:send"} className="text-xl text-white" />} className="bg-[#731C38] text-white w-full h-auto p-4">
+                              Publicar Evento
+                            </Button>
+
+                            <Button icon={<Icon icon={"lucide:save"} className="text-xl text-zinc-700" />} className="bg-white text-zinc-700 w-full h-auto p-4 mt-2 border border-zinc-400">
+                              Guardar Evento
+                            </Button>
+                          </Col>
                         </Card>
                       </Col>
                     </Row>
