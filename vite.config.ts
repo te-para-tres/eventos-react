@@ -14,6 +14,10 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    target: "esnext",
+    chunkSizeWarningLimit: 1600
+  },
   server: {
     port: 3000,
   },
