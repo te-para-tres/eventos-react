@@ -8,7 +8,7 @@ RUN yarn install --frozen-lockfile
 
 COPY . .
 
-RUN  yarn tsc --noEmit && yarn build
+RUN yarn build
 
 
 FROM nginx:alpine
