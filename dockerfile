@@ -4,11 +4,11 @@ WORKDIR /app
 
 COPY package.json yarn.lock ./
 
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile 
 
 COPY . .
 
-RUN yarn build
+RUN  tsc --noEmit && vite build 
 
 
 FROM nginx:alpine
