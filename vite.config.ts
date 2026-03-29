@@ -9,30 +9,19 @@ export default defineConfig({
     tanstackRouter({
       target: "react"
     }),
-    react({
-      jsxImportSource: "react"
-    }),
+    react(),
     tailwindcss()
   ],
   build: {
     sourcemap: false,
     target: "esnext",
-    minify: "esbuild",
-    chunkSizeWarningLimit: 1600
+    minify: "esbuild"
   },
   optimizeDeps: {
-    exclude: [
-      "antd",
-      "chart.js",
-      "leaflet",
-      "@fullcalendar/react"
-    ]
+    exclude: ["leaflet"]
   },
-  esbuild: {
-    legalComments: "none"
-  },
-  server: {
-    port: 3000
+  ssr: {
+    noExternal: ["leaflet"]
   },
   resolve: {
     alias: {
