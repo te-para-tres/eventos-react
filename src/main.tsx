@@ -7,7 +7,6 @@ import VITE_ENV from "./config/constants/vite-env";
 import queryClient from "./config/settings/query-client-settings";
 import router from "./config/settings/router-client-settings";
 import { AntdConfigProvider } from "./config/settings/antd-config-provider";
-import 'leaflet/dist/leaflet.css';
 
 import "./index.css";
 import { ThemeProvider } from "@base/hooks/useTheme/useTheme";

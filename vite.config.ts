@@ -21,7 +21,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          leaflet: ["leaflet", "react-leaflet"],
+
           antd: ["antd", "@ant-design/icons"],
           fullcalendar: [
             "@fullcalendar/core",
@@ -33,9 +33,6 @@ export default defineConfig({
         }
       }
     }
-  },
-  optimizeDeps: {
-    exclude: ["leaflet"]
   },
   resolve: {
     alias: {
