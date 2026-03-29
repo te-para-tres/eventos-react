@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --debug",
+    "build": "vite build ",
     "lint": "eslint .",
     "preview": "vite preview",
     "build:test": "env-cmd -f .env.test.local tsc -b && vite build",
@@ -33,7 +33,6 @@
     "dayjs": "^1.11.13",
     "html5-qrcode": "^2.3.8",
     "jodit-react": "^5.2.19",
-    "leaflet": "^1.9.4",
     "react": "^18.3.1",
     "react-day-picker": "8.10.1",
     "react-dom": "^18.3.1",
