@@ -2,8 +2,8 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-ENV ROLLUP_MAX_WORKERS=2
-ENV NODE_OPTIONS="--max-old-space-size=1024"
+ENV NODE_OPTIONS="--max-old-space-size=1536"
+ENV ROLLUP_MAX_WORKERS=1
 
 COPY package.json yarn.lock ./
 
