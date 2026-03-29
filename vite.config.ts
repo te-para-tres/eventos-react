@@ -12,16 +12,30 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+
   build: {
     sourcemap: false,
     target: "esnext",
-    minify: "esbuild"
+    minify: "esbuild",
+    chunkSizeWarningLimit: 2000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          leaflet: ["leaflet", "react-leaflet"],
+          antd: ["antd", "@ant-design/icons"],
+          fullcalendar: [
+            "@fullcalendar/core",
+            "@fullcalendar/daygrid",
+            "@fullcalendar/timegrid",
+            "@fullcalendar/interaction",
+            "@fullcalendar/react"
+          ]
+        }
+      }
+    }
   },
   optimizeDeps: {
     exclude: ["leaflet"]
-  },
-  ssr: {
-    noExternal: ["leaflet"]
   },
   resolve: {
     alias: {

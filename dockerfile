@@ -2,8 +2,8 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+ENV ROLLUP_MAX_WORKERS=2
 ENV NODE_OPTIONS="--max-old-space-size=2048"
-ENV UV_THREADPOOL_SIZE=64
 
 COPY package.json yarn.lock ./
 
@@ -17,6 +17,7 @@ FROM nginx:alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 80 
+
 
 CMD ["nginx", "-g", "daemon off;"]
