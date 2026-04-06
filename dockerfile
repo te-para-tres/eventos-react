@@ -24,6 +24,7 @@ ENV VITE_VALIDAR_PERMISOS=$VITE_VALIDAR_PERMISOS
 COPY package.json yarn.lock ./
 
 RUN yarn install --frozen-lockfile
+ARG CACHEBUST=1
 
 COPY . .
 
