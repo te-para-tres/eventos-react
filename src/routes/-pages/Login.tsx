@@ -4,6 +4,7 @@ import { UserOutlined } from "@ant-design/icons";
 import { AntdFormValidation } from "@base/constants/antd-form-validation";
 import { Navigate } from "@tanstack/react-router";
 import { Button, Col, Form, Input, Row, Spin } from "antd";
+import { useEffect } from "react";
 
 export interface ILoginForm {
   correo: string;
@@ -11,11 +12,21 @@ export interface ILoginForm {
 }
 
 const LoginPage = () => {
+
   const { login, isIniciandoSesion, isAuthenticated } = useAuth();
 
   if (isAuthenticated) {
     return <Navigate to="/" />;
   }
+
+  const appName = import.meta.env.VITE_APP_NAME;
+  const appVersion = import.meta.env.VITE_APP_VERSION;
+  const appDescription = import.meta.env.VITE_APP_DESCRIPTION;
+  useEffect(() => {
+    document.title = appName;
+    console.log(appName, appVersion, appDescription);
+
+  }, [appName]);
 
   return (
     <div className="h-screen flex">
