@@ -34,6 +34,9 @@ const LoginPage = () => {
         <div className="text-white text-xl font-semibold tracking-tight">
           EventosApp
         </div>
+        <div className="text-white text-xl font-semibold tracking-tight">
+          {appName} {appVersion}
+        </div>
         <div className="text-neutral-400 text-sm">
           © {new Date().getFullYear()} EventosApp. Todos los derechos reservados.
         </div>
