@@ -32,7 +32,7 @@ const LoginPage = () => {
     <div className="h-screen flex">
       <div className="hidden lg:flex w-1/2 h-full bg-[#242424] flex-col justify-between p-10">
         <div className="text-white text-xl font-semibold tracking-tight">
-          EventosApp - Hola hugo
+          EventosApp
         </div>
         <div className="text-white text-xl font-semibold tracking-tight">
           {appName} Versión-{appVersion} + 1
