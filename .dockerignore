@@ -1,0 +1,12 @@
+
+.env
+.env.local
+.env.production
+.env.production.local
+.env.development
+.env.development.local
+.git
+node_modules
+.vscode
+.firebase
+.firebaserc
