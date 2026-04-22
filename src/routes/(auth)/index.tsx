@@ -1,6 +1,6 @@
-import LocalStorageManager from "@/config/constants/localstorage-manager";
 import { Carrera } from "@/models/Carrera.model";
 import { CategoriaEvento } from "@/models/CategoriaEvento.model";
+import { Evento } from "@/models/Evento.model";
 import { UnidadAcademica } from "@/models/UnidadAcademica.model";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { CloseOutlined, CloudUploadOutlined } from "@ant-design/icons";
@@ -8,6 +8,7 @@ import { SelectorQuery } from "@base/components/form/SelectorQuery/SelectorQuery
 import { TextAreaInput } from "@base/components/form/TextAreaInput/TextAreaInput";
 import { TextInput } from "@base/components/form/TextInput/TextInput";
 import { DefaultContainer } from "@base/components/layout/containers/DefaultContainer";
+import useHttp from "@base/hooks/useHttp/useHttp";
 import { PaginaProvider } from "@base/hooks/usePagina/usePagina";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button, Card, Col, ConfigProvider, Form, Row, Steps, Typography, Upload, DatePicker as AntdDatePicker, Divider } from "antd";
@@ -16,7 +17,6 @@ import { useState } from "react";
 import TablaMateriales from "@/components/TablaMateriales";
 import dayjs from "dayjs";
 import 'dayjs/locale/es';
-import ReactDOM from 'react-dom';
 import { QRCodeSVG } from 'qrcode.react';
 
 dayjs.locale('es');
@@ -29,7 +29,7 @@ interface EstatusI {
   titulo: string;
   descripcion: string;
   icono: string;
-  valor: string;
+  valor: Evento["visibilidad"];
 }
 
 const estatusEventos: EstatusI[] = [
@@ -37,19 +37,19 @@ const estatusEventos: EstatusI[] = [
     titulo: "Público",
     descripcion: "Visible para toda la comunidad UES",
     icono: "lucide:earth",
-    valor: "publico"
+    valor: Evento.VISIBILIDAD_1,
   },
   {
     titulo: "Por Unidad Académica",
     descripcion: "Solo estudiantes del campus local",
     icono: "lucide:building",
-    valor: "unidad academica"
+    valor: Evento.VISIBILIDAD_2,
   },
   {
     titulo: "Por Carrera",
     descripcion: "Restringido a carreras específicas",
     icono: "lucide:graduation-cap",
-    valor: "carrera"
+    valor: Evento.VISIBILIDAD_3,
   },
 ];
 
@@ -73,9 +73,11 @@ const pasosConfig = [
 
 function RouteComponent() {
   const [form] = useForm();
-  const token = localStorage.getItem(LocalStorageManager.TOKEN) || "";
+  const http = useHttp();
   const [pasoActual, setPasoActual] = useState<number>(0);
-  const [estado, setEstado] = useState<string>("");
+  const [estado, setEstado] = useState<Evento["visibilidad"]>("");
+  const [tipoGuardado, setTipoGuardado] = useState<"guardar" | "publicar">("guardar");
+  const [isGuardando, setIsGuardando] = useState<boolean>(false);
   const [resumen, setResumen] = useState<{
     titulo?: string,
     fecha?: string,
@@ -83,6 +85,29 @@ function RouteComponent() {
     ubicacion?: string,
     estatus?: string,
   }>();
+
+  const handleGuardar = async (values: Partial<Evento> & { rangoFecha?: any }) => {
+    try {
+      setIsGuardando(true);
+      const { rangoFecha, ...payload } = values;
+      await http.post({
+        endpoint: Evento.ENDPOINTS.DEFAULT,
+        body: {
+          ...payload,
+          estado: payload.estado ?? Evento.ESTATUS_5,
+          visibilidad: payload.visibilidad ?? estado,
+        },
+      });
+
+      form.resetFields();
+      setPasoActual(0);
+      setEstado("");
+      setResumen(undefined);
+      setTipoGuardado("guardar");
+    } finally {
+      setIsGuardando(false);
+    }
+  };
 
   const siguiente = async () => {
     try {
@@ -117,7 +142,14 @@ function RouteComponent() {
                 <Typography.Text className="text-stone-400">
                   {pasosConfig[pasoActual].subtitulo}
                 </Typography.Text>
-                <Form layout="vertical" autoComplete="true" form={form} className="w-full h-auto pt-8" preserve>
+                <Form
+                  layout="vertical"
+                  autoComplete="true"
+                  form={form}
+                  className="w-full h-auto pt-8"
+                  preserve
+                  onFinish={handleGuardar}
+                >
                   <div style={{ display: pasoActual === 0 ? "block" : "none" }}>
                     <Row gutter={[10, 10]}>
                       <Col span={24}>
@@ -132,7 +164,7 @@ function RouteComponent() {
                       <Col span={24} sm={12}>
                         <Form.Item
                           label="Categoría"
-                          name="categoria"
+                          name="idCategoriaEvento"
                         // rules={[AntdFormValidation.Requerido("La categoría es obligatoria")]}
                         >
                           <SelectorQuery
@@ -149,7 +181,7 @@ function RouteComponent() {
                       <Col span={24} sm={12}>
                         <Form.Item
                           label="Departamento Anfitrión"
-                          name="carrera"
+                          name="idCarrera"
                         >
                           <SelectorQuery
                             queryProps={{
@@ -232,7 +264,7 @@ function RouteComponent() {
                       <Col span={24} sm={12}>
                         <Form.Item
                           label="Fecha y Horario"
-                          name=""
+                          name="rangoFecha"
                           className="cursor-pointer"
                         // rules={[AntdFormValidation.Requerido("El lugar es obligatorio")]}
                         >
@@ -244,6 +276,11 @@ function RouteComponent() {
                             }}
                             onChange={(v: any) => {
                               if (v && v?.length > 0) {
+                                form.setFieldsValue({
+                                  fechaInicio: v[0]?.format("YYYY-MM-DD HH:mm:ss"),
+                                  fechaFin: v[1]?.format("YYYY-MM-DD HH:mm:ss"),
+                                });
+
                                 setResumen((prev) => {
                                   const formatStr = "D [de] MMMM, YYYY  hh:mm a";
                                   return {
@@ -252,13 +289,11 @@ function RouteComponent() {
                                     hora: v[1]?.format(formatStr),
                                   };
                                 })
-                                // setRequestParams((prev) => ({
-                                //   ...prev,
-                                //   inicio: v[0]!
-                                //     .startOf("day")
-                                //     .format("YYYY-MM-DD 00:00:00"),
-                                //   fin: v[1]!.endOf("day").format("YYYY-MM-DD 23:59:59"),
-                                // }));
+                              } else {
+                                form.setFieldsValue({
+                                  fechaInicio: undefined,
+                                  fechaFin: undefined,
+                                });
                               }
                             }}
                           />
@@ -298,7 +333,14 @@ function RouteComponent() {
                         {
                           estatusEventos.map((estatus) => (
                             <Col sm={8} span={24}>
-                              <Card onClick={() => setEstado(estatus.valor)} className={`flex flex-col justify-center cursor-pointer transition-all duration-300  items-start gap-4 border-2 ${estado == estatus.valor ? "bg-[#f8f1f1] border-red-900" : ""} w-full h-auto`}>
+                              <Card
+                                onClick={() => {
+                                  setEstado(estatus.valor);
+                                  form.setFieldValue("visibilidad", estatus.valor);
+                                  setResumen((prev) => ({ ...prev, estatus: estatus.titulo }));
+                                }}
+                                className={`flex flex-col justify-center cursor-pointer transition-all duration-300  items-start gap-4 border-2 ${estado == estatus.valor ? "bg-[#f8f1f1] border-red-900" : ""} w-full h-auto`}
+                              >
                                 <Icon icon={estatus.icono} className="inline-block text-red-900 text-3xl mb-2" />
                                 <Typography.Title level={5}>
                                   {estatus.titulo}
@@ -374,7 +416,7 @@ function RouteComponent() {
                               <Col span={16}>
                                 {estado ? (
                                   <span className="bg-emerald-50 text-emerald-700 px-4 py-1.5 rounded-full text-sm font-semibold border border-emerald-100 uppercase tracking-wide">
-                                    {estatusEventos.find((e) => e.valor === estado)?.titulo || estado}
+                                    {resumen?.estatus || estatusEventos.find((e) => e.valor === estado)?.titulo || estado}
                                   </span>
                                 ) : (
                                   <Typography.Text className="text-zinc-300 italic">No seleccionada</Typography.Text>
@@ -428,11 +470,41 @@ function RouteComponent() {
                           </Card>
 
                           <Col span={24}>
-                            <Button icon={<Icon icon={"lucide:send"} className="text-xl text-white" />} className="bg-[#731C38] text-white w-full h-auto p-4">
+                            <Button
+                              icon={<Icon icon={"lucide:send"} className="text-xl text-white" />}
+                              className="bg-[#731C38] text-white w-full h-auto p-4"
+                              loading={isGuardando && tipoGuardado === "publicar"}
+                              disabled={isGuardando}
+                              onClick={async () => {
+                                setTipoGuardado("publicar");
+                                form.setFieldValue("estado", Evento.ESTATUS_6);
+                                try {
+                                  await form.validateFields();
+                                  form.submit();
+                                } catch {
+                                  // validation error
+                                }
+                              }}
+                            >
                               Publicar Evento
                             </Button>
 
-                            <Button icon={<Icon icon={"lucide:save"} className="text-xl text-zinc-700" />} className="bg-white text-zinc-700 w-full h-auto p-4 mt-2 border border-zinc-400">
+                            <Button
+                              icon={<Icon icon={"lucide:save"} className="text-xl text-zinc-700" />}
+                              className="bg-white text-zinc-700 w-full h-auto p-4 mt-2 border border-zinc-400"
+                              loading={isGuardando && tipoGuardado === "guardar"}
+                              disabled={isGuardando}
+                              onClick={async () => {
+                                setTipoGuardado("guardar");
+                                form.setFieldValue("estado", Evento.ESTATUS_5);
+                                try {
+                                  await form.validateFields();
+                                  form.submit();
+                                } catch {
+                                  // validation error
+                                }
+                              }}
+                            >
                               Guardar Evento
                             </Button>
                           </Col>
@@ -459,12 +531,34 @@ function RouteComponent() {
                           Siguiente: {pasosConfig[pasoActual + 1].title}
                         </Button>
                       ) : (
-                        <Button className="bg-[#731C38] text-white" htmlType="submit">
+                        <Button
+                          className="bg-[#731C38] text-white"
+                          htmlType="submit"
+                          loading={isGuardando && tipoGuardado === "guardar"}
+                          disabled={isGuardando}
+                          onClick={() => {
+                            setTipoGuardado("guardar");
+                            form.setFieldValue("estado", Evento.ESTATUS_5);
+                          }}
+                        >
                           Crear Evento
                         </Button>
                       )}
                     </Col>
                   </Row>
+
+                  <Form.Item name="fechaInicio" hidden>
+                    <TextInput />
+                  </Form.Item>
+                  <Form.Item name="fechaFin" hidden>
+                    <TextInput />
+                  </Form.Item>
+                  <Form.Item name="visibilidad" hidden>
+                    <TextInput />
+                  </Form.Item>
+                  <Form.Item name="estado" hidden>
+                    <TextInput />
+                  </Form.Item>
                 </Form>
               </Card>
             </Col>
