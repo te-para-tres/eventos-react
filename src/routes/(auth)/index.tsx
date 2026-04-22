@@ -16,6 +16,8 @@ import { useState } from "react";
 import TablaMateriales from "@/components/TablaMateriales";
 import dayjs from "dayjs";
 import 'dayjs/locale/es';
+import ReactDOM from 'react-dom';
+import { QRCodeSVG } from 'qrcode.react';
 
 dayjs.locale('es');
 
@@ -231,6 +233,7 @@ function RouteComponent() {
                         <Form.Item
                           label="Fecha y Horario"
                           name=""
+                          className="cursor-pointer"
                         // rules={[AntdFormValidation.Requerido("El lugar es obligatorio")]}
                         >
                           <AntdDatePicker.RangePicker
@@ -295,7 +298,7 @@ function RouteComponent() {
                         {
                           estatusEventos.map((estatus) => (
                             <Col sm={8} span={24}>
-                              <Card onClick={() => setEstado(estatus.valor)} className={`flex flex-col justify-center items-start gap-4 border-2 ${estado == estatus.valor ? "bg-[#f8f1f1] border-red-900" : ""} w-full h-auto`}>
+                              <Card onClick={() => setEstado(estatus.valor)} className={`flex flex-col justify-center cursor-pointer transition-all duration-300  items-start gap-4 border-2 ${estado == estatus.valor ? "bg-[#f8f1f1] border-red-900" : ""} w-full h-auto`}>
                                 <Icon icon={estatus.icono} className="inline-block text-red-900 text-3xl mb-2" />
                                 <Typography.Title level={5}>
                                   {estatus.titulo}
@@ -421,7 +424,7 @@ function RouteComponent() {
                             Generación de Acceso
                           </Typography.Title>
                           <Card className="flex justify-center items-center border-stone-400 bg-stone-50 p-12 w-full h-auto">
-                            <div className="rounded bg-zinc-600"></div>
+                            <QRCodeSVG value="https://eventues.app/registro-evento/" />
                           </Card>
 
                           <Col span={24}>
