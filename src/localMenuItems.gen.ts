@@ -39,6 +39,12 @@ const local_menu_items: LocalMenuItem[] = [
     visible: true,
   },
   {
+    key: "/medios",
+    label: "Medios",
+    icon: "lucide:file",
+    visible: true,
+  },
+  {
     key: "/administracion",
     label: "Administración",
     icon: "lucide:shield-user",
