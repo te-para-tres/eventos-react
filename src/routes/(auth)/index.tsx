@@ -1,22 +1,26 @@
-import LocalStorageManager from "@/config/constants/localstorage-manager";
 import { Carrera } from "@/models/Carrera.model";
 import { CategoriaEvento } from "@/models/CategoriaEvento.model";
 import { UnidadAcademica } from "@/models/UnidadAcademica.model";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { CloseOutlined, CloudUploadOutlined } from "@ant-design/icons";
+import { CloseOutlined, CloudUploadOutlined, CheckCircleOutlined, EditOutlined, FileTextOutlined, KeyOutlined, LinkOutlined } from "@ant-design/icons";
 import { SelectorQuery } from "@base/components/form/SelectorQuery/SelectorQuery";
 import { TextAreaInput } from "@base/components/form/TextAreaInput/TextAreaInput";
 import { TextInput } from "@base/components/form/TextInput/TextInput";
 import { DefaultContainer } from "@base/components/layout/containers/DefaultContainer";
-import { PaginaProvider } from "@base/hooks/usePagina/usePagina";
+import { PaginaProvider, usePagina } from "@base/hooks/usePagina/usePagina";
 import { createFileRoute } from "@tanstack/react-router";
-import { Button, Card, Col, ConfigProvider, Form, Row, Steps, Typography, Upload, DatePicker as AntdDatePicker, Divider } from "antd";
+import { Button, Card, Col, ConfigProvider, Form, Modal, Row, Space, Steps, Typography, Upload, DatePicker as AntdDatePicker, Divider, DatePicker } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { useState } from "react";
 import TablaMateriales from "@/components/TablaMateriales";
 import dayjs from "dayjs";
 import 'dayjs/locale/es';
-
+import { AntdFormValidation } from "@base/constants/antd-form-validation";
+import { useAuth } from "@/hooks/useAuth/useAuth";
+import VITE_ENV from "@/config/constants/vite-env";
+import { Media } from "@/models/Media.model";
+import { MediaSelector } from "@/routes/(auth)/medios/index";
+import { Material } from "@/models/Material.model";
 dayjs.locale('es');
 
 export const Route = createFileRoute("/(auth)/")({
@@ -69,11 +73,25 @@ const pasosConfig = [
   },
 ];
 
+const camposPorPaso: string[][] = [
+  ["nombre", "categoria", "descripcion"],
+  ["idUnidadAcademica", "lugar", "fechaHorario"],
+  [],
+];
+
 function RouteComponent() {
   const [form] = useForm();
-  const token = localStorage.getItem(LocalStorageManager.TOKEN) || "";
+  const { token } = useAuth();
   const [pasoActual, setPasoActual] = useState<number>(0);
+  const [modalMediaAbierto, setModalMediaAbierto] = useState(false);
+  const [modalAnexosAbierto, setModalAnexosAbierto] = useState(false);
+
   const [estado, setEstado] = useState<string>("");
+  const [imagenPrincipal, setImagenPrincipal] = useState<Media | null>(null);
+  const [anexos, setAnexos] = useState<Media[]>([]);
+  const [fecha, setFecha] = useState<{ inicio: string, fin: string }>();
+  const [materiales, setMateriales] = useState<Material[]>([]);
+
   const [resumen, setResumen] = useState<{
     titulo?: string,
     fecha?: string,
@@ -84,7 +102,7 @@ function RouteComponent() {
 
   const siguiente = async () => {
     try {
-      await form.validateFields();
+      await form.validateFields(camposPorPaso[pasoActual]);
       setPasoActual((prev) => Math.min(prev + 1, pasosConfig.length - 1));
     } catch {
       // e
@@ -115,7 +133,14 @@ function RouteComponent() {
                 <Typography.Text className="text-stone-400">
                   {pasosConfig[pasoActual].subtitulo}
                 </Typography.Text>
-                <Form layout="vertical" autoComplete="true" form={form} className="w-full h-auto pt-8" preserve>
+                <Form
+                  layout="vertical"
+                  autoComplete="true"
+                  form={form}
+                  className="w-full h-auto pt-8"
+                  preserve
+                  onFinish={(v) => console.log(v)}
+                >
                   <div style={{ display: pasoActual === 0 ? "block" : "none" }}>
                     <Row gutter={[10, 10]}>
                       <Col span={24}>
@@ -176,23 +201,34 @@ function RouteComponent() {
                           label="Imagen de Portada"
                           name="idImagenDestacada"
                         >
-                          <Upload
-                            style={{ width: "100%", height: "auto" }}
-                            showUploadList={false}
-                            multiple
-                            accept="image/*"
-                            name="archivo"
-                          >
-                            <div className="bg-neutral-100 hover:bg-neutral-50 w-auto h-48 p-4 rounded-lg border border-zinc-300 border-dashed cursor-pointer flex flex-col items-center justify-center text-lg text-neutral-950 hover:text-neutral-500 text-center">
-                              <CloudUploadOutlined style={{ fontSize: 50 }} className="text-[#731C38] bg-[#EAE3E8] p-4 rounded-full" />
-                              <Typography.Title level={5} className="text-stone-700 mt-2">
-                                Haga clic para cargar o arrastre y suelte
-                              </Typography.Title>
-                              <Typography.Text className="text-sm text-stone-500">
-                                PNG, JPG o WEBP (Recomendado 16:9, min. 1200x675 px)
-                              </Typography.Text>
-                            </div>
-                          </Upload>
+                          <div className="flex flex-col gap-3">
+                            <Button
+                              icon={<CloudUploadOutlined />}
+                              onClick={() => setModalMediaAbierto(true)}
+                              className="w-1/4 h-auto py-1"
+                            >
+                              Establecer imagen
+                            </Button>
+                            {imagenPrincipal && (
+                              <div className="relative w-56 aspect-[4/3] overflow-hidden rounded-lg border border-slate-200 bg-slate-50 shadow-sm">
+                                <img
+                                  src={`${VITE_ENV.BASE_API_URL}/recursos/${imagenPrincipal.ruta}`}
+                                  alt={imagenPrincipal.nombre}
+                                  className="h-full w-full object-contain"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setImagenPrincipal(null)}
+                                  className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm transition-colors hover:bg-red-500 hover:text-white"
+                                >
+                                  <CloseOutlined style={{ fontSize: 10 }} />
+                                </button>
+                                <Typography.Text className="absolute bottom-0 left-0 right-0 truncate bg-black/50 px-3 py-1 text-xs text-white">
+                                  {imagenPrincipal.nombre}
+                                </Typography.Text>
+                              </div>
+                            )}
+                          </div>
                         </Form.Item>
                       </Col>
                     </Row>
@@ -230,17 +266,21 @@ function RouteComponent() {
                       <Col span={24} sm={12}>
                         <Form.Item
                           label="Fecha y Horario"
-                          name=""
-                        // rules={[AntdFormValidation.Requerido("El lugar es obligatorio")]}
+                        // rules={[AntdFormValidation.Requerido("La fecha y horario son obligatorios")]}
                         >
-                          <AntdDatePicker.RangePicker
+                          <DatePicker.RangePicker
                             format={"DD/MM/YYYY HH:mm"}
                             showTime={{ format: 'HH:mm' }}
                             style={{
                               width: "100%",
                             }}
-                            onChange={(v: any) => {
+                            onChange={(v) => {
                               if (v && v?.length > 0) {
+                                setFecha({
+                                  inicio: v[0]!.format("YYYY-MM-DD HH:mm:ss"),
+                                  fin: v[1]!.format("YYYY-MM-DD HH:mm:ss"),
+                                });
+
                                 setResumen((prev) => {
                                   const formatStr = "D [de] MMMM, YYYY  hh:mm a";
                                   return {
@@ -249,20 +289,16 @@ function RouteComponent() {
                                     hora: v[1]?.format(formatStr),
                                   };
                                 })
-                                // setRequestParams((prev) => ({
-                                //   ...prev,
-                                //   inicio: v[0]!
-                                //     .startOf("day")
-                                //     .format("YYYY-MM-DD 00:00:00"),
-                                //   fin: v[1]!.endOf("day").format("YYYY-MM-DD 23:59:59"),
-                                // }));
                               }
                             }}
                           />
                         </Form.Item>
                       </Col>
                       <Col span={24}>
-                        <TablaMateriales />
+                        <TablaMateriales
+                          setMateriales={setMateriales}
+                          materiales={materiales}
+                        />
                       </Col>
                     </Row>
                   </div>
@@ -312,18 +348,18 @@ function RouteComponent() {
                   </div>
 
                   <div style={{ display: pasoActual === 3 ? "block" : "none" }}>
-                    <Row gutter={[10, 10]}>
-                      <Col sm={16} span={24}>
-                        <Card className="shadow-sm border-zinc-100 overflow-hidden">
+                    <Row gutter={[16, 16]}>
+                      <Col xs={24} md={16}>
+                        <Card>
                           <Row justify={"space-between"} align={"middle"} className="mb-6">
                             <Typography.Title level={4} className="flex items-center m-0 text-zinc-800">
-                              <Icon icon={"lucide:file-text"} className="mr-3 text-[#731C38] text-2xl" />
+                              <FileTextOutlined className="mr-3 text-[#731C38] text-2xl" />
                               Resumen del Evento
                             </Typography.Title>
                             <Button
                               type="link"
                               onClick={() => setPasoActual(0)}
-                              icon={<Icon icon={"lucide:pencil"} className="text-xs" />}
+                              icon={<EditOutlined />}
                               className="text-[#731C38] font-medium hover:text-red-900 flex items-center gap-1"
                             >
                               Editar todo
@@ -380,9 +416,41 @@ function RouteComponent() {
                             </Row>
                           </Col>
                         </Card>
+                      </Col>
+
+                      <Col xs={24} md={8}>
+                        <Card
+                          title={
+                            <Space>
+                              <KeyOutlined />
+                              Generación de Acceso
+                            </Space>
+                          }
+                          size="small"
+                          className="w-auto h-full"
+                        >
+                          <Space direction="vertical" size="middle" className="w-full">
+                            <Card className="flex justify-center items-center border-stone-400 bg-stone-50 p-12 w-full h-auto">
+                              <div className="rounded bg-zinc-600"></div>
+                            </Card>
+
+                            <Button type="primary" icon={<CheckCircleOutlined />} block size="large">
+                              Publicar Evento
+                            </Button>
+
+                            <Button block>
+                              Guardar Evento
+                            </Button>
+                          </Space>
+                        </Card>
+                      </Col>
+                    </Row>
+
+                    <Row gutter={[16, 16]} className="mt-3">
+                      <Col xs={24} span={24}>
                         <Card>
                           <Typography.Title level={4} className="flex items-center m-0 text-zinc-800 mb-4">
-                            <Icon icon={"lucide:link"} className="mr-3 text-[#731C38] text-2xl" />
+                            <LinkOutlined className="mr-3 text-[#731C38] text-2xl" />
                             Flyers Digitales y Anexos
                           </Typography.Title>
                           <Typography.Text className="text-zinc-400 mb-4">
@@ -391,48 +459,40 @@ function RouteComponent() {
 
                           <Form.Item
                             className="w-full h-auto"
-                            label="Imagen de Portada"
-                            name="idImagenDestacada"
                           >
-                            <Upload
-                              style={{ width: "100%", height: "auto" }}
-                              showUploadList={false}
-                              multiple
-                              accept="image/*,application/pdf"
-                              name="archivo"
-                            >
-                              <div className="bg-neutral-100 hover:bg-neutral-50 w-auto h-48 p-4 rounded-lg border border-zinc-300 border-dashed cursor-pointer flex flex-col items-center justify-center text-lg text-neutral-950 hover:text-neutral-500 text-center">
-                                <CloudUploadOutlined style={{ fontSize: 50 }} className="text-[#731C38] bg-[#EAE3E8] p-4 rounded-full" />
-                                <Typography.Title level={5} className="text-stone-700 mt-2">
-                                  Haga clic para cargar o arrastre y suelte
-                                </Typography.Title>
-                                <Typography.Text className="text-sm text-stone-500">
-                                  Formato recomendado Vertical (A4 o 1080px). Max 5MB
-                                </Typography.Text>
+                            <div className="flex flex-col gap-3">
+                              <Button
+                                icon={<CloudUploadOutlined />}
+                                onClick={() => setModalAnexosAbierto(true)}
+                                className="w-auto h-auto py-1 mt-2"
+                              >
+                                Agregar Anexos al Evento
+                              </Button>
+                              <div className="grid sm:grid-cols-4 gap-4 w-full h-auto">
+                                {anexos && (
+                                  anexos.map((anexo) => (
+                                    <div key={anexo.id} className="relative w-56 aspect-[4/3] overflow-hidden rounded-lg border border-slate-200 bg-slate-50 shadow-sm">
+                                      <img
+                                        src={`${VITE_ENV.BASE_API_URL}/recursos/${anexo.ruta}`}
+                                        alt={anexo.nombre}
+                                        className="h-full w-full object-contain"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => setAnexos((prev) => prev.filter((a) => a.id !== anexo.id))}
+                                        className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm transition-colors hover:bg-red-500 hover:text-white"
+                                      >
+                                        <CloseOutlined style={{ fontSize: 10 }} />
+                                      </button>
+                                      <Typography.Text className="absolute bottom-0 left-0 right-0 truncate bg-black/50 px-3 py-1 text-xs text-white">
+                                        {anexo.nombre}
+                                      </Typography.Text>
+                                    </div>
+                                  ))
+                                )}
                               </div>
-                            </Upload>
+                            </div>
                           </Form.Item>
-                        </Card>
-                      </Col>
-
-                      <Col sm={8} span={24}>
-                        <Card className="w-full h-auto p-6">
-                          <Typography.Title level={4} className="text-zinc-400 mb-4">
-                            Generación de Acceso
-                          </Typography.Title>
-                          <Card className="flex justify-center items-center border-stone-400 bg-stone-50 p-12 w-full h-auto">
-                            <div className="rounded bg-zinc-600"></div>
-                          </Card>
-
-                          <Col span={24}>
-                            <Button icon={<Icon icon={"lucide:send"} className="text-xl text-white" />} className="bg-[#731C38] text-white w-full h-auto p-4">
-                              Publicar Evento
-                            </Button>
-
-                            <Button icon={<Icon icon={"lucide:save"} className="text-xl text-zinc-700" />} className="bg-white text-zinc-700 w-full h-auto p-4 mt-2 border border-zinc-400">
-                              Guardar Evento
-                            </Button>
-                          </Col>
                         </Card>
                       </Col>
                     </Row>
@@ -468,6 +528,45 @@ function RouteComponent() {
           </Row>
         </div>
       </DefaultContainer>
+
+      <Modal
+        open={modalMediaAbierto}
+        onCancel={() => setModalMediaAbierto(false)}
+        footer={null}
+        width="90vw"
+        style={{ maxWidth: 1200 }}
+        title="Biblioteca de Medios"
+        styles={{ body: { padding: 0, maxHeight: "80vh", overflow: "auto" } }}
+      >
+        <MediaSelector
+          onSelectMedia={(media) => {
+            setImagenPrincipal(media);
+            setModalMediaAbierto(false);
+          }}
+        />
+      </Modal>
+
+      <Modal
+        open={modalAnexosAbierto}
+        onCancel={() => setModalAnexosAbierto(false)}
+        footer={null}
+        width="90vw"
+        style={{ maxWidth: 1200 }}
+        title="Seleccionar Anexos"
+        styles={{ body: { padding: 0, maxHeight: "80vh", overflow: "auto" } }}
+      >
+        <MediaSelector
+          multiple
+          onSelectMultiple={(medias) => {
+            setAnexos((prev) => {
+              const existentes = new Set(prev.map((m) => m.id));
+              const nuevos = medias.filter((m) => !existentes.has(m.id));
+              return [...prev, ...nuevos];
+            });
+            setModalAnexosAbierto(false);
+          }}
+        />
+      </Modal>
     </PaginaProvider>
   );
 }
