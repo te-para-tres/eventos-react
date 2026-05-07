@@ -9,17 +9,18 @@ import { TextInput } from "@base/components/form/TextInput/TextInput";
 import { AntdFormValidation } from "@base/constants/antd-form-validation";
 import { NumberInput } from "@base/components/form/NumberInput/NumberInput";
 import { useForm } from "antd/es/form/Form";
+interface Props {
+  setMateriales: (materiales: Material[]) => void;
+  materiales: Material[];
+}
 
-type MaterialFila = Material & { key: string };
-
-const TablaMateriales: React.FC = () => {
+const TablaMateriales: React.FC<Props> = ({ setMateriales, materiales }) => {
   const [form] = useForm();
   const [formVisible, setFormVisible] = useState<boolean>(false);
-  const [materiales, setMateriales] = useState<MaterialFila[]>([]);
   const [materialEditandoKey, setMaterialEditandoKey] = useState<string | null>(null);
 
   const columns = useMemo(() => {
-    const _columns: ColumnType<MaterialFila>[] = [];
+    const _columns: ColumnType<Material>[] = [];
     _columns.push({
       key: "acciones",
       width: 10,
@@ -28,14 +29,14 @@ const TablaMateriales: React.FC = () => {
           <div onClick={(e) => e.stopPropagation()}>
             <ActionsButton
               onEliminar={() => {
-                setMateriales((prev) =>
-                  prev.filter((item) => item.key !== record.key),
-                );
-                if (materialEditandoKey === record.key) {
-                  form.resetFields();
-                  setMaterialEditandoKey(null);
-                  setFormVisible(false);
-                }
+                // setMateriales((prev) =>
+                //   prev.filter((item) => item.key !== record.key),
+                // );
+                // if (materialEditandoKey === record.key) {
+                //   form.resetFields();
+                //   setMaterialEditandoKey(null);
+                //   setFormVisible(false);
+                // }
               }}
             />
           </div>
@@ -60,37 +61,47 @@ const TablaMateriales: React.FC = () => {
       title: "Notas",
       dataIndex: "nota",
     });
-    
+
     return _columns;
   }, [form, materialEditandoKey])
 
-  const onEditar = useCallback((record: MaterialFila) => {
-    form.setFieldsValue(record);
-    setMaterialEditandoKey(record.key);
-    setFormVisible(true);
-  }, [form]);
-
-  const onFinish = useCallback((values: Material) => {
+  const onFinish = useCallback(async () => {
     try {
-      if (materialEditandoKey) {
-        setMateriales((prev) =>
-          prev.map((item) =>
-            item.key === materialEditandoKey ? { ...item, ...values } : item,
-          ),
-        );
-      } else {
-        setMateriales((prev) => [
-          ...prev,
-          { ...values, key: crypto.randomUUID() },
-        ]);
-      }
-      form.resetFields();
-      setFormVisible(false);
-      setMaterialEditandoKey(null);
+      await form.validateFields()
+      const values = form.getFieldsValue();
+      setMateriales([...values, values]);
     } catch (error) {
       return error;
     }
-  }, [form, materialEditandoKey]);
+  }, [setMateriales, form]);
+
+  // const onEditar = useCallback((record: MaterialFila) => {
+  //   form.setFieldsValue(record);
+  //   setMaterialEditandoKey(record.key);
+  //   setFormVisible(true);
+  // }, [form]);
+
+  // const onFinish = useCallback((values: Material) => {
+  //   try {
+  //     if (materialEditandoKey) {
+  //       setMateriales((prev) =>
+  //         prev.map((item) =>
+  //           item.key === materialEditandoKey ? { ...item, ...values } : item,
+  //         ),
+  //       );
+  //     } else {
+  //       setMateriales((prev) => [
+  //         ...prev,
+  //         { ...values, key: crypto.randomUUID() },
+  //       ]);
+  //     }
+  //     form.resetFields();
+  //     setFormVisible(false);
+  //     setMaterialEditandoKey(null);
+  //   } catch (error) {
+  //     return error;
+  //   }
+  // }, [form, materialEditandoKey]);
 
 
   return (
@@ -160,8 +171,6 @@ const TablaMateriales: React.FC = () => {
                 <Col span={6}>
                   <Button
                     type="primary"
-                    htmlType="button"
-                    onClick={() => form.submit()}
                     icon={<Icon icon="lucide:check" />}
                     block
                   >
@@ -180,7 +189,7 @@ const TablaMateriales: React.FC = () => {
           dataSource={materiales}
           rowKey="key"
           onRow={(record) => ({
-            onClick: () => onEditar(record),
+            // onClick: () => onEditar(record),
           })}
           rowClassName="cursor-pointer"
         />
