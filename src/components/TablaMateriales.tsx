@@ -10,7 +10,7 @@ import { AntdFormValidation } from "@base/constants/antd-form-validation";
 import { NumberInput } from "@base/components/form/NumberInput/NumberInput";
 import { useForm } from "antd/es/form/Form";
 interface Props {
-  setMateriales: (materiales: Material[]) => void;
+  setMateriales: React.Dispatch<React.SetStateAction<Material[]>>;
   materiales: Material[];
 }
 
@@ -29,14 +29,14 @@ const TablaMateriales: React.FC<Props> = ({ setMateriales, materiales }) => {
           <div onClick={(e) => e.stopPropagation()}>
             <ActionsButton
               onEliminar={() => {
-                // setMateriales((prev) =>
-                //   prev.filter((item) => item.key !== record.key),
-                // );
-                // if (materialEditandoKey === record.key) {
-                //   form.resetFields();
-                //   setMaterialEditandoKey(null);
-                //   setFormVisible(false);
-                // }
+                setMateriales((prev) =>
+                  prev.filter((item) => item.id !== record.id),
+                );
+                if (materialEditandoKey === record.id) {
+                  form.resetFields();
+                  setMaterialEditandoKey(null);
+                  setFormVisible(false);
+                }
               }}
             />
           </div>
@@ -65,15 +65,13 @@ const TablaMateriales: React.FC<Props> = ({ setMateriales, materiales }) => {
     return _columns;
   }, [form, materialEditandoKey])
 
-  const onFinish = useCallback(async () => {
-    try {
-      await form.validateFields()
-      const values = form.getFieldsValue();
-      setMateriales([...values, values]);
-    } catch (error) {
-      return error;
-    }
-  }, [setMateriales, form]);
+  const onFinish = useCallback(() => {
+    form.validateFields().then((values) => {
+      setMateriales([...materiales, { ...values, key: crypto.randomUUID() }]);
+      form.resetFields();
+      setFormVisible(false);
+    }).catch(() => { });
+  }, [setMateriales, form, materiales]);
 
   // const onEditar = useCallback((record: MaterialFila) => {
   //   form.setFieldsValue(record);
@@ -171,8 +169,10 @@ const TablaMateriales: React.FC<Props> = ({ setMateriales, materiales }) => {
                 <Col span={6}>
                   <Button
                     type="primary"
+                    // htmlType="submit"
                     icon={<Icon icon="lucide:check" />}
                     block
+                    onClick={() => form.submit()}
                   >
                     {materialEditandoKey ? "Guardar cambios" : "Confirmar y Agregar"}
                   </Button>
