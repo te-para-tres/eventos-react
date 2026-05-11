@@ -24,7 +24,7 @@ function RouteComponent() {
   const http = useHttp();
   const handleAgregar = () => {
     router.navigate({
-      to: `${ModelClass.BASE_ROUTE}/detalle`,
+      to: `/`,
     });
   };
 
@@ -83,7 +83,7 @@ function RouteComponent() {
                 placeholder: "Buscar...",
               },
             }}
-            
+
           />
         </Col>
       </Row>

@@ -206,11 +206,7 @@ export default function Formulario({
                   </span>
                 }
               >
-                <Tag>
-                  {visibilidadMap[evento.visibilidad ?? ""] ??
-                    evento.visibilidad ||
-                    "—"}
-                </Tag>
+                {evento.visibilidad}
               </Descriptions.Item>
             </Descriptions>
 
