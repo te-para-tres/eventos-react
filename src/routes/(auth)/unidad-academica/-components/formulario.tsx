@@ -33,7 +33,7 @@ export default function Formulario({
             name="nombre"
             rules={[AntdFormValidation.Requerido("El nombre es obligatorio")]}
           >
-            <TextInput placeholder="Ej. Facultad de Ingeniería" />
+            <TextInput placeholder="Ej. Universidad Estatal de Sonora Plantel Navojoa" />
           </Form.Item>
         </Col>
 
@@ -52,8 +52,9 @@ export default function Formulario({
             label="Teléfono"
             name="telefono"
             rules={[AntdFormValidation.Requerido("El teléfono es obligatorio"), AntdFormValidation.Telefono()]}
+            normalize={(value) => value ? value.replace(/[^0-9]/g, "") : value}
           >
-            <TextInput placeholder="Ej. 6621234567" />
+            <TextInput maxLength={10} minLength={10} showCount={false} placeholder="Ej. 5512345678" />
           </Form.Item>
         </Col>
 

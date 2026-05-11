@@ -1,6 +1,6 @@
 import QueryProps from "@base/interfaces/requests/query-props.interface";
-import { useQuery } from "@tanstack/react-query";
-import React, { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import React, { useEffect, useState } from "react";
 import useHttp from "../useHttp/useHttp";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -20,6 +20,7 @@ export function useDetalle<T = any>({
 }: useDetalleProps) {
   const navigate = useNavigate();
   const http = useHttp();
+  const queryClient = useQueryClient();
   const [isGuardando, setIsGuardando] = useState(false);
 
   const { data, refetch, isLoading, isPending, error, isError } = useQuery({
@@ -41,14 +42,13 @@ export function useDetalle<T = any>({
   });
 
   const modelo: T | null = React.useMemo(() => {
+    if (!isEditando) return null;
     const resultado = data?.resultado;
-
     if (resultado && resultado.length == 1) {
       return resultado[0];
     }
-
     return null;
-  }, [data]);
+  }, [data, isEditando]);
 
   const titulo = React.useMemo(() => {
     if (isEditando) {
@@ -75,7 +75,9 @@ export function useDetalle<T = any>({
             ...values,
           },
           onSuccess: () => {
-            refetch();
+            if (isEditando) {
+              refetch();
+            }
             if (autoNavigate) {
               navigate({ to: ".." });
             }
@@ -98,9 +100,13 @@ export function useDetalle<T = any>({
     return isLoading || isPending || (!data && !isError) || (data && !modelo);
   }, [isLoading, isPending, isEditando, data, modelo, isError]);
 
-  // useEffect(() => {
-  //   console.log("isGuardando", isGuardando);
-  // }, [isGuardando]);
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries({
+        queryKey: [queryProps?.queryKey ?? queryProps.endpoint],
+      });
+    };
+  }, [queryClient, queryProps]);
 
   return {
     modelo,

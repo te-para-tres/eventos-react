@@ -1,6 +1,6 @@
 import { Material } from "@/models/Material.model";
 import ActionsButton from "@base/components/buttons/ActionsButton";
-import { Button, Card, Col, Form, Row, Table, Typography } from "antd";
+import { Button, Card, Col, Divider, Form, Row, Segmented, Table, Tag, Typography } from "antd";
 import { ColumnType } from "antd/es/table";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useCallback, useMemo, useState } from "react";
@@ -9,102 +9,100 @@ import { TextInput } from "@base/components/form/TextInput/TextInput";
 import { AntdFormValidation } from "@base/constants/antd-form-validation";
 import { NumberInput } from "@base/components/form/NumberInput/NumberInput";
 import { useForm } from "antd/es/form/Form";
+import { SelectorQuery } from "@base/components/form/SelectorQuery/SelectorQuery";
+
 interface Props {
   setMateriales: React.Dispatch<React.SetStateAction<Material[]>>;
   materiales: Material[];
 }
 
+type ModoAgregado = "inventario" | "manual";
+
 const TablaMateriales: React.FC<Props> = ({ setMateriales, materiales }) => {
   const [form] = useForm();
   const [formVisible, setFormVisible] = useState<boolean>(false);
   const [materialEditandoKey, setMaterialEditandoKey] = useState<string | null>(null);
+  const [modo, setModo] = useState<ModoAgregado>("inventario");
 
   const columns = useMemo(() => {
     const _columns: ColumnType<Material>[] = [];
     _columns.push({
       key: "acciones",
       width: 10,
-      render: (_, record) => {
-        return (
-          <div onClick={(e) => e.stopPropagation()}>
-            <ActionsButton
-              onEliminar={() => {
-                setMateriales((prev) =>
-                  prev.filter((item) => item.id !== record.id),
-                );
-                if (materialEditandoKey === record.id) {
-                  form.resetFields();
-                  setMaterialEditandoKey(null);
-                  setFormVisible(false);
-                }
-              }}
-            />
-          </div>
-        );
-      },
+      render: (_, record) => (
+        <div onClick={(e) => e.stopPropagation()}>
+          <ActionsButton
+            onEliminar={() => {
+              setMateriales((prev) => prev.filter((item) => item.id !== record.id));
+              if (materialEditandoKey === record.id) {
+                form.resetFields();
+                setMaterialEditandoKey(null);
+                setFormVisible(false);
+              }
+            }}
+          />
+        </div>
+      ),
     });
 
     _columns.push({
       key: "nombre",
       title: "Material/Equipo",
       dataIndex: "nombre",
+      render: (nombre: string, record: any) => (
+        <span>
+          {nombre}
+          {record._desdeInventario && (
+            <Tag color="blue" className="ml-2 text-xs">Inventario</Tag>
+          )}
+        </span>
+      ),
     });
 
-    _columns.push({
-      key: "cantidad",
-      title: "Cantidad",
-      dataIndex: "cantidad",
-    });
-
-    _columns.push({
-      key: "nota",
-      title: "Notas",
-      dataIndex: "nota",
-    });
+    _columns.push({ key: "cantidad", title: "Cantidad", dataIndex: "cantidad" });
+    _columns.push({ key: "nota", title: "Notas", dataIndex: "nota" });
 
     return _columns;
-  }, [form, materialEditandoKey])
+  }, [form, materialEditandoKey, setMateriales]);
 
-  const onFinish = useCallback(() => {
+  /** Agrega material desde inventario (objeto completo del servidor) */
+  const onAgregarDesdeInventario = useCallback(
+    (materialData: Material) => {
+      if (!materialData) return;
+      const yaExiste = materiales.some((m) => m.id === materialData.id);
+      if (yaExiste) return;
+      setMateriales((prev) => [
+        ...prev,
+        { ...materialData, key: materialData.id ?? crypto.randomUUID(), _desdeInventario: true } as any,
+      ]);
+    },
+    [materiales, setMateriales]
+  );
+
+  /** Agrega material creado manualmente */
+  const onFinishManual = useCallback(() => {
     form.validateFields().then((values) => {
-      setMateriales([...materiales, { ...values, key: crypto.randomUUID() }]);
+      setMateriales((prev) => [
+        ...prev,
+        { ...values, key: crypto.randomUUID(), _desdeInventario: false } as any,
+      ]);
       form.resetFields();
       setFormVisible(false);
     }).catch(() => { });
-  }, [setMateriales, form, materiales]);
+  }, [setMateriales, form]);
 
-  // const onEditar = useCallback((record: MaterialFila) => {
-  //   form.setFieldsValue(record);
-  //   setMaterialEditandoKey(record.key);
-  //   setFormVisible(true);
-  // }, [form]);
-
-  // const onFinish = useCallback((values: Material) => {
-  //   try {
-  //     if (materialEditandoKey) {
-  //       setMateriales((prev) =>
-  //         prev.map((item) =>
-  //           item.key === materialEditandoKey ? { ...item, ...values } : item,
-  //         ),
-  //       );
-  //     } else {
-  //       setMateriales((prev) => [
-  //         ...prev,
-  //         { ...values, key: crypto.randomUUID() },
-  //       ]);
-  //     }
-  //     form.resetFields();
-  //     setFormVisible(false);
-  //     setMaterialEditandoKey(null);
-  //   } catch (error) {
-  //     return error;
-  //   }
-  // }, [form, materialEditandoKey]);
-
+  const handleToggleForm = () => {
+    if (formVisible) {
+      form.resetFields();
+      setMaterialEditandoKey(null);
+    }
+    setFormVisible(!formVisible);
+  };
 
   return (
     <Row className="w-full h-auto">
-      <Row justify={"space-between"} className="w-full h-auto">
+      {/* Header */}
+      <Row justify="space-between" className="w-full h-auto">
         <Col span={12}>
           <Typography.Title level={4} className="flex items-center my-4 text-zinc-600">
             <Icon icon="lucide:archive" className="inline-block mr-2" /> Materiales y Equipo
@@ -112,28 +110,71 @@ const TablaMateriales: React.FC<Props> = ({ setMateriales, materiales }) => {
         </Col>
         <Col span={12} className="flex items-center justify-end">
           <Button
-            onClick={() => {
-              if (formVisible) {
-                form.resetFields();
-                setMaterialEditandoKey(null);
-              }
-              setFormVisible(!formVisible);
-            }}
+            onClick={handleToggleForm}
             danger={formVisible}
             icon={<Icon icon={formVisible ? "lucide:x" : "lucide:plus"} />}
           >
-            {formVisible ? "Cancelar" : "Nuevo Material"}
+            {formVisible ? "Cancelar" : "Agregar Material"}
           </Button>
         </Col>
       </Row>
 
-      {
-        formVisible && (
-          <Card className="mb-4 w-full h-auto">
+      {/* Panel de agregar */}
+      {formVisible && (
+        <Card className="mb-4 w-full h-auto">
+          {/* Selector de modo */}
+          <Segmented
+            className="mb-4"
+            value={modo}
+            onChange={(v) => {
+              setModo(v as ModoAgregado);
+              form.resetFields();
+            }}
+            options={[
+              { label: <span><Icon icon="lucide:search" className="mr-1 inline-block" />Buscar en inventario</span>, value: "inventario" },
+              { label: <span><Icon icon="lucide:pencil" className="mr-1 inline-block" />Agregar manualmente</span>, value: "manual" },
+            ]}
+          />
+
+          <Divider className="my-3" />
+
+          {/* Modo inventario */}
+          {modo === "inventario" && (
+            <Row gutter={[10, 10]}>
+              <Col span={24}>
+                <Typography.Text className="text-zinc-400 text-sm block mb-2">
+                  Busca un material existente del inventario y selecciónalo para agregarlo al evento.
+                </Typography.Text>
+              </Col>
+              <Col span={24}>
+                <SelectorQuery
+                  queryProps={{
+                    endpoint: Material.ENDPOINTS.DEFAULT,
+                    enabled: true,
+                    extraParams: { ordenar: "nombre-asc" },
+                  }}
+                  selectProps={{
+                    placeholder: "Buscar material en inventario...",
+                    style: { width: "100%" },
+                  }}
+                  blacklist={materiales}
+                  onSelect={(data) => {
+                    if (data) {
+                      onAgregarDesdeInventario(data as Material);
+                      setFormVisible(false);
+                    }
+                  }}
+                />
+              </Col>
+            </Row>
+          )}
+
+          {/* Modo manual */}
+          {modo === "manual" && (
             <Form
               component={false}
               form={form}
-              onFinish={onFinish}
+              onFinish={onFinishManual}
               layout="vertical"
               className="w-full h-auto"
             >
@@ -142,9 +183,7 @@ const TablaMateriales: React.FC<Props> = ({ setMateriales, materiales }) => {
                   <Form.Item
                     label="Material/Equipo"
                     name="nombre"
-                    rules={[
-                      AntdFormValidation.Requerido("El material es obligatorio")
-                    ]}
+                    rules={[AntdFormValidation.Requerido("El material es obligatorio")]}
                   >
                     <TextInput placeholder="Ej. Sillas" />
                   </Form.Item>
@@ -159,43 +198,38 @@ const TablaMateriales: React.FC<Props> = ({ setMateriales, materiales }) => {
                   </Form.Item>
                 </Col>
                 <Col span={24}>
-                  <Form.Item
-                    label="Notas"
-                    name="nota"
-                  >
+                  <Form.Item label="Notas" name="nota">
                     <TextAreaInput placeholder="Ej. Necesario para el auditorio" />
                   </Form.Item>
                 </Col>
-                <Col span={6}>
+                <Col span={8}>
                   <Button
                     type="primary"
-                    // htmlType="submit"
                     icon={<Icon icon="lucide:check" />}
                     block
                     onClick={() => form.submit()}
                   >
-                    {materialEditandoKey ? "Guardar cambios" : "Confirmar y Agregar"}
+                    Confirmar y Agregar
                   </Button>
                 </Col>
               </Row>
             </Form>
-          </Card>
-        )
-      }
+          )}
+        </Card>
+      )}
 
+      {/* Tabla */}
       <Col span={24}>
         <Table
           columns={columns}
           dataSource={materiales}
-          rowKey="key"
-          onRow={(record) => ({
-            // onClick: () => onEditar(record),
-          })}
+          rowKey={(r: any) => r.key ?? r.id}
           rowClassName="cursor-pointer"
+          locale={{ emptyText: "Sin materiales agregados" }}
         />
       </Col>
-    </Row >
-  )
+    </Row>
+  );
 };
 
 export default TablaMateriales;

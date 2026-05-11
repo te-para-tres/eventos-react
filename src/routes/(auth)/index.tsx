@@ -20,7 +20,10 @@ import VITE_ENV from "@/config/constants/vite-env";
 import { Media } from "@/models/Media.model";
 import { MediaSelector } from "@/routes/(auth)/medios/index";
 import { Material } from "@/models/Material.model";
+import { QRCodeSVG } from "qrcode.react";
 dayjs.locale('es');
+
+const QR_MOCKUP_URL = "https://eventues.app/registro-evento";
 
 export const Route = createFileRoute("/(auth)/")({
   component: RouteComponent,
@@ -90,6 +93,7 @@ function RouteComponent() {
   const [anexos, setAnexos] = useState<Media[]>([]);
   const [fecha, setFecha] = useState<{ inicio: string, fin: string }>();
   const [materiales, setMateriales] = useState<Material[]>([]);
+  const [qrUrl, setQrUrl] = useState<string | null>(null);
 
   const [resumen, setResumen] = useState<{
     titulo?: string,
@@ -114,7 +118,7 @@ function RouteComponent() {
       ...formValues,
       imagenPrincipal: imagenPrincipal?.id,
       anexos: anexos.map((anexo) => anexo.id),
-      materiales: materiales.map((material) => material.id),
+      materiales: materiales.map(({ nombre, cantidad, nota }) => ({ nombre, cantidad, nota })),
     }
 
     console.log("datosCompletos", datosCompletos);
@@ -341,9 +345,11 @@ function RouteComponent() {
                           </Typography.Title>
                         </Col>
                         {
-                          estatusEventos.map((estatus) => (
-                            <Col sm={8} span={24}>
-                              <Card onClick={() => setEstado(estatus.valor)} className={`flex flex-col justify-center items-start gap-4 border-2 ${estado == estatus.valor ? "bg-[#f8f1f1] border-red-900" : ""} w-full h-auto`}>
+                          estatusEventos.map((estatus, index) => (
+                            <Col
+                              key={index}
+                              sm={8} span={24}>
+                              <Card onClick={() => setEstado(estatus.valor)} className={`cursor-pointer flex flex-col justify-center items-start gap-4 border-2 ${estado == estatus.valor ? "bg-[#f8f1f1] border-red-900" : ""} w-full h-auto`}>
                                 <Icon icon={estatus.icono} className="inline-block text-red-900 text-3xl mb-2" />
                                 <Typography.Title level={5}>
                                   {estatus.titulo}
@@ -442,18 +448,52 @@ function RouteComponent() {
                           className="w-auto h-full"
                         >
                           <Space direction="vertical" size="middle" className="w-full">
-                            <Card className="flex justify-center items-center border-stone-400 bg-stone-50 p-12 w-full h-auto">
-                              <div className="rounded bg-zinc-600"></div>
-                            </Card>
+                             <Card className="flex flex-col justify-center items-center border-stone-400 bg-stone-50 w-full h-auto" style={{ minHeight: 180 }}>
+                               {qrUrl ? (
+                                 <div className="flex flex-col items-center gap-3 py-4">
+                                   <QRCodeSVG
+                                     value={qrUrl}
+                                     size={140}
+                                     bgColor="#f8f8f8"
+                                     fgColor="#731C38"
+                                     level="H"
+                                     includeMargin
+                                   />
+                                   <Typography.Text className="text-xs text-zinc-400 text-center break-all px-2">
+                                     {qrUrl}
+                                   </Typography.Text>
+                                   <Button
+                                     size="small"
+                                     danger
+                                     onClick={() => setQrUrl(null)}
+                                   >
+                                     Limpiar QR
+                                   </Button>
+                                 </div>
+                               ) : (
+                                 <Typography.Text className="text-zinc-400 text-sm text-center">
+                                   Genera el QR para que los asistentes accedan al evento
+                                 </Typography.Text>
+                               )}
+                             </Card>
 
-                            <Button type="primary" icon={<CheckCircleOutlined />} block size="large">
-                              Publicar Evento
-                            </Button>
+                             <Button
+                               icon={<KeyOutlined />}
+                               block
+                               onClick={() => setQrUrl(QR_MOCKUP_URL)}
+                               disabled={!!qrUrl}
+                             >
+                               {qrUrl ? "QR Generado" : "Generar QR de Acceso"}
+                             </Button>
 
-                            <Button block>
-                              Guardar Evento
-                            </Button>
-                          </Space>
+                             <Button type="primary" icon={<CheckCircleOutlined />} block size="large">
+                               Publicar Evento
+                             </Button>
+
+                             <Button block>
+                               Guardar Evento
+                             </Button>
+                           </Space>
                         </Card>
                       </Col>
                     </Row>
