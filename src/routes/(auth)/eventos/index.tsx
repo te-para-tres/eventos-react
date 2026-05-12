@@ -69,7 +69,7 @@ function RouteComponent() {
 
 
   const categoriasQuery = useQuery({
-    queryKey: ["categorias-filter", CategoriaEvento.ENDPOINTS.DEFAULT],
+    queryKey: ["categorias-filter", CategoriaEvento.ENDPOINTS.DEFAULT, http],
     queryFn: () =>
       http.get({
         endpoint: CategoriaEvento.ENDPOINTS.DEFAULT,
