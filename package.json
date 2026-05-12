@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "5.x",
+    "@ant-design/pro-components": "^2.8.10",
     "@fullcalendar/core": "^6.1.17",
     "@fullcalendar/daygrid": "^6.1.17",
     "@fullcalendar/interaction": "^6.1.17",
