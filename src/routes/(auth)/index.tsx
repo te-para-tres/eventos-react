@@ -10,7 +10,7 @@ import { DefaultContainer } from "@base/components/layout/containers/DefaultCont
 import { AntdFormValidation } from "@base/constants/antd-form-validation";
 import { PaginaProvider } from "@base/hooks/usePagina/usePagina";
 import { createFileRoute } from "@tanstack/react-router";
-import { Button, Card, Col, ConfigProvider, DatePicker, Divider, Form, Modal, Row, Space, Steps, Typography } from "antd";
+import { Button, Card, Checkbox, Col, ConfigProvider, DatePicker, Divider, Form, Modal, Row, Space, Steps, Typography } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { useState } from "react";
 import TablaMateriales from "@/components/TablaMateriales";
@@ -117,6 +117,7 @@ function RouteComponent() {
   const [eventoCreadoId, setEventoCreadoId] = useState<string | number | null>(null);
   const [modalQrAbierto, setModalQrAbierto] = useState(false);
   const [creandoEvento, setCreandoEvento] = useState(false);
+  const [perteneceActividad, setPerteneceActividad] = useState(false);
 
   const [resumen, setResumen] = useState<{
     titulo?: string,
@@ -129,7 +130,11 @@ function RouteComponent() {
   const siguiente = async (e?: React.MouseEvent) => {
     e?.preventDefault();
     try {
-      await form.validateFields(camposPorPaso[pasoActual]);
+      const camposAValidar = [...camposPorPaso[pasoActual]];
+      if (pasoActual === 0 && perteneceActividad) {
+        camposAValidar.push("idActividad");
+      }
+      await form.validateFields(camposAValidar);
       setPasoActual((prev) => Math.min(prev + 1, pasosConfig.length - 1));
     } catch {
       // e
@@ -139,7 +144,10 @@ function RouteComponent() {
   const handleOnFinish = async () => {
     if (pasoActual < pasosConfig.length - 1) return;
 
-    await form.validateFields(camposPorPaso.flat());
+    const camposAValidarTotales = camposPorPaso.flat();
+    if (perteneceActividad) camposAValidarTotales.push("idActividad");
+
+    await form.validateFields(camposAValidarTotales);
 
     const formValues = form.getFieldsValue();
     const datosCompletos = {
@@ -151,6 +159,10 @@ function RouteComponent() {
       fechaFin: fecha?.fin,
       estado: "publico",
       visibilidad: formValues.visibilidad,
+    }
+
+    if (!perteneceActividad) {
+      delete datosCompletos.idActividad;
     }
 
     delete datosCompletos.fechaHorario;
@@ -214,12 +226,37 @@ function RouteComponent() {
                   layout="vertical"
                   autoComplete="true"
                   form={form}
-                  className="w-full h-auto pt-8"
+                  className="w-full h-auto pt-2"
                   preserve
                   onFinish={handleOnFinish}
                 >
                   <div style={{ display: pasoActual === 0 ? "block" : "none" }}>
                     <Row gutter={[10, 10]}>
+                      <Col span={24}>
+                        <Checkbox
+                          checked={perteneceActividad}
+                          onChange={(e) => setPerteneceActividad(e.target.checked)}
+                          className="pt-2 text-stone-600 font-medium"
+                        >
+                          ¿Pertenece a una actividad?
+                        </Checkbox>
+                      </Col>
+                      {perteneceActividad && (
+                        <Col span={24}>
+                          <Form.Item
+                            label="Actividad"
+                            name="idActividad"
+                            rules={[AntdFormValidation.Requerido("La actividad es obligatoria")]}
+                          >
+                            <SelectorQuery
+                              queryProps={{
+                                endpoint: "/v1/actividad.json",
+                                enabled: true,
+                              }}
+                            />
+                          </Form.Item>
+                        </Col>
+                      )}
                       <Col span={24}>
                         <Form.Item
                           label="Titulo del Evento"
