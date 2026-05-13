@@ -1,5 +1,5 @@
 import Formulario from "./-components/formulario";
-import { Evento as ModelClass } from "@/models/Evento.model";
+import { Actividad as ModelClass } from "@/models/Actividad.model";
 import {
   PaginaProvider,
   usePagina,
@@ -7,7 +7,7 @@ import {
 import { createFileRoute } from "@tanstack/react-router";
 import { DetalleLayout } from "@base/components/layout/crud/DetalleLayout";
 
-export const Route = createFileRoute("/(auth)/eventos/detalle")(
+export const Route = createFileRoute("/(auth)/actividad/detalle")(
   {
     component: () => (
       <PaginaProvider titulo={`Detalle de ${ModelClass.CLASS_NAME}`}>
@@ -31,9 +31,8 @@ function RouteComponent() {
         endpoint: ModelClass.ENDPOINTS.DEFAULT,
         extraParams: {
           id: queryParams?.id,
-          expand: ModelClass.EXPAND.DEFAULT,
         },
-        enabled: !!queryParams?.id, //Solo se ejecuta si existe el id
+        enabled: !!queryParams?.id,
       }}
       Formulario={Formulario}
     />

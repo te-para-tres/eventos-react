@@ -39,6 +39,12 @@ const local_menu_items: LocalMenuItem[] = [
     visible: true,
   },
   {
+    key: "/actividad",
+    label: "Actividades",
+    icon: "lucide:git-pull-request-create",
+    visible: true,
+  },
+  {
     key: "/medios",
     label: "Medios",
     icon: "lucide:file",
