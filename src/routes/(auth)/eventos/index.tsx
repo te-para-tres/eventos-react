@@ -8,6 +8,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Col, Row, Tag, Typography } from "antd";
 import { Evento as ModelClass } from "@/models/Evento.model";
 import { CategoriaEvento } from "@/models/CategoriaEvento.model";
+import { Carrera } from "@/models/Carrera.model";
+import { Actividad } from "@/models/Actividad.model";
 import ActionsButton from "@base/components/buttons/ActionsButton";
 import useHttp from "@base/hooks/useHttp/useHttp";
 import { ProTable } from "@ant-design/pro-components";
@@ -77,6 +79,24 @@ function RouteComponent() {
       }),
   });
 
+  const carrerasQuery = useQuery({
+    queryKey: ["carreras-filter", Carrera.ENDPOINTS.DEFAULT, http],
+    queryFn: () =>
+      http.get({
+        endpoint: Carrera.ENDPOINTS.DEFAULT,
+        params: { ordenar: "nombre-asc", limite: 200 },
+      }),
+  });
+
+  const actividadesQuery = useQuery({
+    queryKey: ["actividades-filter", Actividad.ENDPOINTS.DEFAULT, http],
+    queryFn: () =>
+      http.get({
+        endpoint: Actividad.ENDPOINTS.DEFAULT,
+        params: { ordenar: "nombre-asc", limite: 100 },
+      }),
+  });
+
   const categoriaFilters = useMemo(() => {
     const resultado = categoriasQuery.data?.resultado ?? [];
     const enumMap: Record<string, { text: string }> = {};
@@ -87,6 +107,28 @@ function RouteComponent() {
     }
     return enumMap;
   }, [categoriasQuery.data]);
+
+  const carreraFilters = useMemo(() => {
+    const resultado = carrerasQuery.data?.resultado ?? [];
+    const enumMap: Record<string, { text: string }> = {};
+    for (const c of resultado) {
+      if (c.id && c.nombre) {
+        enumMap[c.id] = { text: c.nombre };
+      }
+    }
+    return enumMap;
+  }, [carrerasQuery.data]);
+
+  const actividadFilters = useMemo(() => {
+    const resultado = actividadesQuery.data?.resultado ?? [];
+    const enumMap: Record<string, { text: string }> = {};
+    for (const a of resultado) {
+      if (a.id && a.nombre) {
+        enumMap[a.id] = { text: a.nombre };
+      }
+    }
+    return enumMap;
+  }, [actividadesQuery.data]);
 
   const handleEliminar = useCallback(
     (value: any, data: any) => {
@@ -154,6 +196,30 @@ function RouteComponent() {
         ),
       },
       {
+        title: "Carrera",
+        dataIndex: "idCarrera",
+        key: "idCarrera",
+        valueType: "select",
+        valueEnum: carreraFilters,
+        render: (_: any, data: any) => (
+          <Typography.Text>
+            {data.carrera?.nombre || "—"}
+          </Typography.Text>
+        ),
+      },
+      {
+        title: "Actividad",
+        dataIndex: "idActividad",
+        key: "idActividad",
+        valueType: "select",
+        valueEnum: actividadFilters,
+        render: (_: any, data: any) => (
+          <Typography.Text>
+            {data.actividad?.nombre || "—"}
+          </Typography.Text>
+        ),
+      },
+      {
         title: "Estado",
         dataIndex: "estado",
         key: "estado",
@@ -206,7 +272,7 @@ function RouteComponent() {
           data.capacidadMaxima ? `${data.capacidadMaxima} personas` : "—",
       },
     ],
-    [categoriaFilters, handleEliminar]
+    [categoriaFilters, carreraFilters, actividadFilters, handleEliminar]
   );
 
   return (
@@ -238,6 +304,8 @@ function RouteComponent() {
               // Map ProTable filter params to API params
               if (params.nombre) queryParams.buscar = params.nombre;
               if (params.idCategoriaEvento) queryParams.idCategoriaEvento = params.idCategoriaEvento;
+              if (params.idCarrera) queryParams.idCarrera = params.idCarrera;
+              if (params.idActividad) queryParams.idActividad = params.idActividad;
               if (params.estado) queryParams.estado = params.estado;
               if (params.visibilidad) queryParams.visibilidad = params.visibilidad;
               if (params.fechaInicio) queryParams.fechaDesde = params.fechaInicio;
