@@ -2,7 +2,8 @@ import { IFormularioBaseProps } from "@base/interfaces/forms/FormularioBase.inte
 import { Evento } from "@/models/Evento.model";
 import VITE_ENV from "@/config/constants/vite-env";
 import dayjs from "dayjs";
-import { Card, Col, Descriptions, Divider, Empty, Image, Row, Tag, Typography } from "antd";
+import { Card, Col, Descriptions, Divider, Drawer, Empty, FloatButton, Image, Row, Tag, Typography } from "antd";
+import { useState } from "react";
 import {
   CalendarOutlined,
   EnvironmentOutlined,
@@ -53,6 +54,8 @@ export default function Formulario({
     color: "default",
   };
 
+  const [drawerVisible, setDrawerVisible] = useState(false);
+
   const esImagen = (extension?: string) =>
     extension &&
     ["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(
@@ -86,7 +89,7 @@ export default function Formulario({
       </Row>
 
       <Row gutter={[24, 16]}>
-        <Col xs={24} md={16}>
+        <Col span={24}>
           <Card
             title={
               <span>
@@ -102,6 +105,11 @@ export default function Formulario({
               <Descriptions.Item label="Carrera / Departamento">
                 {evento.carrera?.nombre || "—"}
               </Descriptions.Item>
+              {evento.actividad && (
+                <Descriptions.Item label="Actividad">
+                  {evento.actividad.nombre || "—"}
+                </Descriptions.Item>
+              )}
               <Descriptions.Item label="Descripción" span={2}>
                 {evento.descripcion || "Sin descripción"}
               </Descriptions.Item>
@@ -141,10 +149,17 @@ export default function Formulario({
                   ? dayjs(evento.fechaFin).format("DD/MM/YYYY HH:mm")
                   : "—"}
               </Descriptions.Item>
+              {evento.estado === "CANCELADO" && evento.fechaCancelacion && (
+                <Descriptions.Item label="Fecha de Cancelación">
+                  <Typography.Text type="danger">
+                    {dayjs(evento.fechaCancelacion).format("DD/MM/YYYY HH:mm")}
+                  </Typography.Text>
+                </Descriptions.Item>
+              )}
             </Descriptions>
           </Card>
 
-          {evento.eventoMaterial && evento.eventoMaterial.length > 0 && (
+          {((evento.materiales && evento.materiales.length > 0) || (evento.eventoMaterial && evento.eventoMaterial.length > 0)) && (
             <Card
               title={
                 <span>
@@ -155,24 +170,24 @@ export default function Formulario({
               className="mt-4"
             >
               <Row gutter={[12, 12]}>
-                {evento.eventoMaterial.map((em) => (
-                  <Col key={em.id} xs={24} sm={12} md={8}>
+                {(evento.materiales ?? evento.eventoMaterial?.map((em) => ({ ...em.material, cantidad: em.cantidad, nota: em.material?.nota, id: em.id })) ?? []).map((m) => (
+                  <Col key={m.id} xs={24} sm={12} md={8}>
                     <Card size="small" className="h-full">
                       <Typography.Text strong>
-                        {em.material?.nombre || "Material"}
+                        {m.nombre || "Material"}
                       </Typography.Text>
                       <br />
                       <Typography.Text type="secondary">
-                        Cantidad: {em.cantidad}
+                        Cantidad: {m.cantidad ?? "—"}
                       </Typography.Text>
-                      {em.material?.nota && (
+                      {m.nota && (
                         <>
                           <br />
                           <Typography.Text
                             type="secondary"
                             style={{ fontSize: 12 }}
                           >
-                            {em.material.nota}
+                            {m.nota}
                           </Typography.Text>
                         </>
                       )}
@@ -184,52 +199,7 @@ export default function Formulario({
           )}
         </Col>
 
-        <Col xs={24} md={8}>
-          <Card
-            title={
-              <span>
-                <TeamOutlined className="mr-2" />
-                Acceso y Visibilidad
-              </span>
-            }
-          >
-            <Descriptions column={1} size="small">
-              <Descriptions.Item label="Capacidad">
-                {evento.capacidadMinima ?? 0} –{" "}
-                {evento.capacidadMaxima ?? "Sin límite"} asistentes
-              </Descriptions.Item>
-              <Descriptions.Item
-                label={
-                  <span>
-                    <EyeOutlined className="mr-1" />
-                    Visibilidad
-                  </span>
-                }
-              >
-                {evento.visibilidad}
-              </Descriptions.Item>
-            </Descriptions>
-
-            {evento.qr && (
-              <>
-                <Divider />
-                <Typography.Text type="secondary" className="block mb-2">
-                  Código QR de Acceso
-                </Typography.Text>
-                <div className="flex justify-center">
-                  <QRCodeSVG
-                    value={`https://eventues.app/registro-evento?evento=${evento.id}`}
-                    size={150}
-                    fgColor="#731C38"
-                    level="H"
-                  />
-                </div>
-              </>
-            )}
-          </Card>
-        </Col>
-
-        {evento.eventoMedia && evento.eventoMedia.length > 0 && (
+        {((evento.medias && evento.medias.length > 0) || (evento.eventoMedia && evento.eventoMedia.length > 0)) && (
           <Col span={24}>
             <Card
               title={
@@ -241,16 +211,17 @@ export default function Formulario({
             >
               <Image.PreviewGroup>
                 <Row gutter={[16, 16]}>
-                  {evento.eventoMedia.map((em) => {
-                    const ruta = em.media?.ruta;
-                    const nombre = em.media?.nombre || "Sin nombre";
+                  {(evento.medias ?? evento.eventoMedia?.map((em) => em.media).filter(Boolean) ?? []).map((media) => {
+                    if (!media) return null;
+                    const ruta = media.ruta;
+                    const nombre = media.nombre || "Sin nombre";
                     const url = ruta
                       ? `${VITE_ENV.BASE_API_URL}/recursos/${ruta}`
                       : "";
 
                     return (
-                      <Col key={em.id} xs={12} sm={8} md={6} lg={4}>
-                        {esImagen(em.media?.extension) && url ? (
+                      <Col key={media.id} xs={12} sm={8} md={6} lg={4}>
+                        {esImagen(media.extension) && url ? (
                           <>
                             <Image
                               src={url}
@@ -286,7 +257,7 @@ export default function Formulario({
                               type="secondary"
                               style={{ fontSize: 11 }}
                             >
-                              {em.media?.extension?.toUpperCase() ||
+                              {media.extension?.toUpperCase() ||
                                 "Archivo"}
                             </Typography.Text>
                           </Card>
@@ -300,6 +271,60 @@ export default function Formulario({
           </Col>
         )}
       </Row>
+
+      <FloatButton
+        icon={<EyeOutlined />}
+        onClick={() => setDrawerVisible(true)}
+        tooltip="Acceso y Visibilidad"
+        style={{ right: 24, bottom: 24 }}
+      />
+
+      <Drawer
+        title={
+          <span>
+            <TeamOutlined className="mr-2" />
+            Acceso y Visibilidad
+          </span>
+        }
+        open={drawerVisible}
+        onClose={() => setDrawerVisible(false)}
+        placement="right"
+        width={380}
+      >
+        <Descriptions column={1} size="small">
+          <Descriptions.Item label="Capacidad">
+            {evento.capacidadMinima ?? 0} –{" "}
+            {evento.capacidadMaxima ?? "Sin límite"} asistentes
+          </Descriptions.Item>
+          <Descriptions.Item
+            label={
+              <span>
+                <EyeOutlined className="mr-1" />
+                Visibilidad
+              </span>
+            }
+          >
+            {evento.visibilidad}
+          </Descriptions.Item>
+        </Descriptions>
+
+        {evento.qr && (
+          <>
+            <Divider />
+            <Typography.Text type="secondary" className="block mb-2">
+              Código QR de Acceso
+            </Typography.Text>
+            <div className="flex justify-center">
+              <QRCodeSVG
+                value={`https://eventues.app/registro-evento?id=${evento.id}`}
+                size={180}
+                fgColor="#731C38"
+                level="H"
+              />
+            </div>
+          </>
+        )}
+      </Drawer>
     </div>
   );
 }

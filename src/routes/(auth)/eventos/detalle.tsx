@@ -31,6 +31,7 @@ function RouteComponent() {
         endpoint: ModelClass.ENDPOINTS.DEFAULT,
         extraParams: {
           id: queryParams?.id,
+          expand: ModelClass.EXPAND.DEFAULT,
         },
         enabled: !!queryParams?.id, //Solo se ejecuta si existe el id
       }}
