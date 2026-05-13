@@ -35,6 +35,8 @@ export default function Formulario({
   modelo,
   isLoading = false,
 }: IFormularioBaseProps<Evento>) {
+  const [drawerVisible, setDrawerVisible] = useState(false);
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-16">
@@ -53,8 +55,6 @@ export default function Formulario({
     label: evento.estado || "Desconocido",
     color: "default",
   };
-
-  const [drawerVisible, setDrawerVisible] = useState(false);
 
   const esImagen = (extension?: string) =>
     extension &&
@@ -270,6 +270,50 @@ export default function Formulario({
             </Card>
           </Col>
         )}
+
+        <Col span={24}>
+          <Card
+            title={
+              <span>
+                <TeamOutlined className="mr-2" />
+                Asistentes ({evento.asistentes?.length ?? 0})
+              </span>
+            }
+          >
+            {(evento.asistentes && evento.asistentes.length > 0) ? (
+              <Row gutter={[16, 16]}>
+                {evento.asistentes.map((asistente) => (
+                  <Col key={asistente.id} xs={24} sm={12} md={8} lg={6}>
+                    <Card size="small" className="h-full">
+                      <Typography.Text strong>
+                        {asistente.nombre || "Sin nombre"}
+                      </Typography.Text>
+                      {asistente.expediente && (
+                        <>
+                          <br />
+                          <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                            Exp: {asistente.expediente}
+                          </Typography.Text>
+                        </>
+                      )}
+                      {asistente.carrera && (
+                        <>
+                          <br />
+                          <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                            {asistente.carrera}
+                          </Typography.Text>
+                        </>
+                      )}
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            ) : (
+              <Empty description="No hay asistentes registrados" />
+            )}
+          </Card>
+        </Col>
+        
       </Row>
 
       <FloatButton

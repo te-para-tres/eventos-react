@@ -8,6 +8,7 @@ import { Actividad } from "./Actividad.model";
 import { Material } from "./Material.model";
 import { Media } from "./Media.model";
 import { UnidadAcademica } from "./UnidadAcademica.model";
+import { Asistente } from "./Asistente.model";
 
 export class Evento extends ModeloBase {
   idUnidadAcademica?: string;
@@ -39,6 +40,7 @@ export class Evento extends ModeloBase {
   unidadAcademica?: UnidadAcademica;
   actividad?: Actividad;
   qr?: Media;
+  asistentes?: Asistente[];
 
   static ESTATUS_1 = "INFORMACION_BASICA";
   static ESTATUS_2 = "LOGISTICA";
@@ -61,7 +63,7 @@ export class Evento extends ModeloBase {
 
   static EXPAND = {
     DEFAULT:
-      "eventoMaterial,eventoMedia,materiales,medias,carrera,categoriaEvento,imagenDestacada,unidadAcademica,actividad,qr",
+      "eventoMaterial,eventoMedia,materiales,medias,carrera,categoriaEvento,imagenDestacada,unidadAcademica,actividad,qr,asistentes",
   };
 
   static fromJson(data: Partial<Evento>) {
