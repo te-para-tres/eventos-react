@@ -38,7 +38,7 @@ export default function Formulario({
   });
 
   const modulosQuery = useQuery({
-    queryKey: [Modulo.ENDPOINTS.DEFAULT, moduloParams],
+    queryKey: [Modulo.ENDPOINTS.DEFAULT, moduloParams, http],
     queryFn: () => {
       return http.get({
         endpoint: Modulo.ENDPOINTS.DEFAULT,

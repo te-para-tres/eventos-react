@@ -66,7 +66,7 @@ function RouteComponent() {
           render: (value: string, data: any) => (
             <Link to="/actividad/detalle"
               search={{ id: data?.id, ...requestParams }}>
-              <span className="text-blue-500 underline cursor-pointer">{value}</span>
+              {value}
             </Link >
           ),
         }

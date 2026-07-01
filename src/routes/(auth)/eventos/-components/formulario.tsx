@@ -2,8 +2,16 @@ import { IFormularioBaseProps } from "@base/interfaces/forms/FormularioBase.inte
 import { Evento } from "@/models/Evento.model";
 import VITE_ENV from "@/config/constants/vite-env";
 import dayjs from "dayjs";
-import { Card, Col, Descriptions, Divider, Drawer, Empty, FloatButton, Image, Row, Tag, Typography } from "antd";
-import { useState } from "react";
+import {
+  Card,
+  Col,
+  Empty,
+  Image,
+  Row,
+  Tag,
+  Typography,
+} from "antd";
+import { QRCodeSVG } from "qrcode.react";
 import {
   CalendarOutlined,
   EnvironmentOutlined,
@@ -13,7 +21,8 @@ import {
   TeamOutlined,
   ToolOutlined,
 } from "@ant-design/icons";
-import { QRCodeSVG } from "qrcode.react";
+
+const ACCENT = "#731C38";
 
 const visibilidadMap: Record<string, string> = {
   publico: "Público",
@@ -31,12 +40,47 @@ const estadoMap: Record<string, { label: string; color: string }> = {
   CANCELADO: { label: "Cancelado", color: "red" },
 };
 
+// Label sobre el valor
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <Typography.Text
+      className="block text-xs uppercase tracking-wide mb-1"
+      style={{ color: ACCENT }}
+    >
+      {children}
+    </Typography.Text>
+  );
+}
+
+function InfoCard({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <Card
+      title={
+        <span className="flex items-center gap-2" style={{ color: ACCENT }}>
+          <span style={{ color: ACCENT }}>{icon}</span>
+          {title}
+        </span>
+      }
+      className="shadow-sm"
+      styles={{ title: { color: ACCENT, borderBottom: `2px solid ${ACCENT}30` } }}
+    >
+      {children}
+    </Card>
+  );
+}
+
 export default function Formulario({
   modelo,
   isLoading = false,
 }: IFormularioBaseProps<Evento>) {
-  const [drawerVisible, setDrawerVisible] = useState(false);
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-16">
@@ -62,8 +106,24 @@ export default function Formulario({
       extension.toLowerCase()
     );
 
+  const qrValue = `https://eventues.app/registro-evento?id=${evento.id}`;
+
+  const materialesList = evento.materiales ??
+    evento.eventoMaterial?.map((em) => ({
+      ...em.material,
+      cantidad: em.cantidad,
+      nota: em.nota,
+      id: em.id,
+    })) ??
+    [];
+
+  const mediosList = evento.medias ??
+    evento.eventoMedia?.map((em) => em.media).filter(Boolean) ??
+    [];
+
   return (
-    <div className="p-4 rounded-lg border border-neutral-300 bg-white">
+    <div className="p-4 space-y-4">
+      {/* Imagen de portada */}
       {evento.imagenDestacada && (
         <div className="mb-6 overflow-hidden rounded-lg">
           <Image
@@ -75,150 +135,183 @@ export default function Formulario({
         </div>
       )}
 
-      <Row justify="space-between" align="middle" className="mb-6">
+      {/* Título y estado */}
+      <Row justify="space-between" align="middle">
         <Col>
           <Typography.Title level={2} className="!m-0">
             {evento.nombre || "Sin nombre"}
           </Typography.Title>
         </Col>
         <Col>
-          <Tag color={estadoInfo.color} className="text-sm px-3 py-0.5">
+          <Tag color={estadoInfo.color} className="text-sm px-3 py-0.5 border-0" style={{ background: `${ACCENT}15`, color: ACCENT }}>
             {estadoInfo.label}
           </Tag>
         </Col>
       </Row>
 
-      <Row gutter={[24, 16]}>
-        <Col span={24}>
-          <Card
-            title={
-              <span>
-                <InfoCircleOutlined className="mr-2" />
-                Información del Evento
-              </span>
-            }
-          >
-            <Descriptions column={{ xs: 1, sm: 2 }} size="small">
-              <Descriptions.Item label="Categoría">
-                {evento.categoriaEvento?.nombre || "—"}
-              </Descriptions.Item>
-              <Descriptions.Item label="Carrera / Departamento">
-                {evento.carrera?.nombre || "—"}
-              </Descriptions.Item>
+      <Row gutter={[24, 24]}>
+        {/* Columna principal — Información del evento + Logística + QR */}
+        <Col xs={24} md={16} className="flex flex-col gap-4">
+          <InfoCard title="Información del Evento" icon={<InfoCircleOutlined />}>
+            <Row gutter={[16, 8]}>
+              <Col span={24} sm={12}>
+                <FieldLabel>Categoría</FieldLabel>
+                <Typography.Text className="text-stone-800 block">
+                  {evento.categoriaEvento?.nombre || "—"}
+                </Typography.Text>
+              </Col>
+              <Col span={24} sm={12}>
+                <FieldLabel>Carrera / Departamento</FieldLabel>
+                <Typography.Text className="text-stone-800 block">
+                  {evento.carrera?.nombre || "—"}
+                </Typography.Text>
+              </Col>
               {evento.actividad && (
-                <Descriptions.Item label="Actividad">
-                  {evento.actividad.nombre || "—"}
-                </Descriptions.Item>
+                <Col span={24} sm={12}>
+                  <FieldLabel>Actividad</FieldLabel>
+                  <Typography.Text className="text-stone-800 block">
+                    {evento.actividad.nombre}
+                  </Typography.Text>
+                </Col>
               )}
-              <Descriptions.Item label="Descripción" span={2}>
-                {evento.descripcion || "Sin descripción"}
-              </Descriptions.Item>
-            </Descriptions>
-          </Card>
+              <Col span={24}>
+                <FieldLabel>Descripción</FieldLabel>
+                <Typography.Text className="text-stone-700 block">
+                  {evento.descripcion || "Sin descripción"}
+                </Typography.Text>
+              </Col>
+            </Row>
+          </InfoCard>
 
-          <Card
-            title={
-              <span>
-                <CalendarOutlined className="mr-2" />
-                Logística
-              </span>
-            }
-            className="mt-4"
-          >
-            <Descriptions column={{ xs: 1, sm: 2 }} size="small">
-              <Descriptions.Item label="Unidad Académica">
-                {evento.unidadAcademica?.nombre || "—"}
-              </Descriptions.Item>
-              <Descriptions.Item
-                label={
-                  <span>
-                    <EnvironmentOutlined className="mr-1" />
-                    Lugar
-                  </span>
-                }
-              >
-                {evento.lugar || "—"}
-              </Descriptions.Item>
-              <Descriptions.Item label="Fecha y Hora de Inicio">
-                {evento.fechaInicio
-                  ? dayjs(evento.fechaInicio).format("DD/MM/YYYY HH:mm")
-                  : "—"}
-              </Descriptions.Item>
-              <Descriptions.Item label="Fecha y Hora de Fin">
-                {evento.fechaFin
-                  ? dayjs(evento.fechaFin).format("DD/MM/YYYY HH:mm")
-                  : "—"}
-              </Descriptions.Item>
+          <InfoCard title="Logística" icon={<CalendarOutlined />}>
+            <Row gutter={[16, 8]}>
+              <Col span={24} sm={12}>
+                <FieldLabel>Unidad Académica</FieldLabel>
+                <Typography.Text className="text-stone-800 block">
+                  {evento.unidadAcademica?.nombre || "—"}
+                </Typography.Text>
+              </Col>
+              <Col span={24} sm={12}>
+                <FieldLabel>
+                  <EnvironmentOutlined className="mr-1" /> Lugar
+                </FieldLabel>
+                <Typography.Text className="text-stone-800 block">
+                  {evento.lugar || "—"}
+                </Typography.Text>
+              </Col>
+              <Col span={24} sm={12}>
+                <FieldLabel>Fecha y Hora de Inicio</FieldLabel>
+                <Typography.Text className="text-stone-800 block">
+                  {evento.fechaInicio
+                    ? dayjs(evento.fechaInicio).format("DD/MM/YYYY HH:mm")
+                    : "—"}
+                </Typography.Text>
+              </Col>
+              <Col span={24} sm={12}>
+                <FieldLabel>Fecha y Hora de Fin</FieldLabel>
+                <Typography.Text className="text-stone-800 block">
+                  {evento.fechaFin
+                    ? dayjs(evento.fechaFin).format("DD/MM/YYYY HH:mm")
+                    : "—"}
+                </Typography.Text>
+              </Col>
               {evento.estado === "CANCELADO" && evento.fechaCancelacion && (
-                <Descriptions.Item label="Fecha de Cancelación">
+                <Col span={24}>
+                  <FieldLabel>Fecha de Cancelación</FieldLabel>
                   <Typography.Text type="danger">
                     {dayjs(evento.fechaCancelacion).format("DD/MM/YYYY HH:mm")}
                   </Typography.Text>
-                </Descriptions.Item>
+                </Col>
               )}
-            </Descriptions>
-          </Card>
+            </Row>
+          </InfoCard>
 
-          {((evento.materiales && evento.materiales.length > 0) || (evento.eventoMaterial && evento.eventoMaterial.length > 0)) && (
-            <Card
-              title={
-                <span>
-                  <ToolOutlined className="mr-2" />
-                  Materiales Requeridos
-                </span>
-              }
-              className="mt-4"
-            >
+          {/* Acceso y QR — ahora inline */}
+          <InfoCard title="Acceso y QR" icon={<EyeOutlined />}>
+            <Row gutter={[16, 8]} align="middle">
+              <Col xs={24} sm={8}>
+                <FieldLabel>Capacidad</FieldLabel>
+                <Typography.Text className="text-stone-800">
+                  {evento.capacidadMinima ?? 0} – {evento.capacidadMaxima ?? "∞"} personas
+                </Typography.Text>
+              </Col>
+              <Col xs={24} sm={8}>
+                <FieldLabel>Visibilidad</FieldLabel>
+                <Typography.Text className="text-stone-800">
+                  {visibilidadMap[evento.visibilidad ?? ""] || evento.visibilidad || "—"}
+                </Typography.Text>
+              </Col>
+              <Col xs={24} sm={8}>
+                {evento.qr ? (
+                  <div className="flex flex-col items-center">
+                    <Typography.Text className="text-xs text-stone-400 mb-1 block text-center">
+                      Código QR de Acceso
+                    </Typography.Text>
+                    <QRCodeSVG
+                      value={qrValue}
+                      size={100}
+                      fgColor={ACCENT}
+                      level="H"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center">
+                    <Typography.Text className="text-xs text-stone-400 mb-1 block text-center">
+                      Código QR de Acceso
+                    </Typography.Text>
+                    <QRCodeSVG
+                      value={qrValue}
+                      size={100}
+                      fgColor={ACCENT}
+                      level="L"
+                      style={{ opacity: 0.4 }}
+                    />
+                    <Typography.Text className="text-xs text-stone-400 mt-1 text-center">
+                      QR pendiente
+                    </Typography.Text>
+                  </div>
+                )}
+              </Col>
+            </Row>
+          </InfoCard>
+
+          {/* Materiales */}
+          {(materialesList.length > 0) && (
+            <InfoCard title="Materiales Requeridos" icon={<ToolOutlined />}>
               <Row gutter={[12, 12]}>
-                {(evento.materiales ?? evento.eventoMaterial?.map((em) => ({ ...em.material, cantidad: em.cantidad, nota: em.material?.nota, id: em.id })) ?? []).map((m) => (
+                {materialesList.map((m) => (
                   <Col key={m.id} xs={24} sm={12} md={8}>
-                    <Card size="small" className="h-full">
-                      <Typography.Text strong>
+                    <Card size="small" className="h-full border-l-2" style={{ borderLeftColor: ACCENT }}>
+                      <Typography.Text strong className="text-stone-800 block">
                         {m.nombre || "Material"}
                       </Typography.Text>
-                      <br />
-                      <Typography.Text type="secondary">
+                      <Typography.Text type="secondary" className="text-xs block">
                         Cantidad: {m.cantidad ?? "—"}
                       </Typography.Text>
                       {m.nota && (
-                        <>
-                          <br />
-                          <Typography.Text
-                            type="secondary"
-                            style={{ fontSize: 12 }}
-                          >
-                            {m.nota}
-                          </Typography.Text>
-                        </>
+                        <Typography.Text type="secondary" className="text-xs block mt-1">
+                          {m.nota}
+                        </Typography.Text>
                       )}
                     </Card>
                   </Col>
                 ))}
               </Row>
-            </Card>
+            </InfoCard>
           )}
-        </Col>
 
-        {((evento.medias && evento.medias.length > 0) || (evento.eventoMedia && evento.eventoMedia.length > 0)) && (
-          <Col span={24}>
-            <Card
-              title={
-                <span>
-                  <PictureOutlined className="mr-2" />
-                  Galería de Imágenes y Anexos
-                </span>
-              }
-            >
+          {/* Galería */}
+          {mediosList.length > 0 && (
+            <InfoCard title="Galería de Imágenes y Anexos" icon={<PictureOutlined />}>
               <Image.PreviewGroup>
                 <Row gutter={[16, 16]}>
-                  {(evento.medias ?? evento.eventoMedia?.map((em) => em.media).filter(Boolean) ?? []).map((media) => {
+                  {mediosList.map((media: any) => {
                     if (!media) return null;
                     const ruta = media.ruta;
                     const nombre = media.nombre || "Sin nombre";
                     const url = ruta
                       ? `${VITE_ENV.BASE_API_URL}/recursos/${ruta}`
                       : "";
-
                     return (
                       <Col key={media.id} xs={12} sm={8} md={6} lg={4}>
                         {esImagen(media.extension) && url ? (
@@ -242,23 +335,12 @@ export default function Formulario({
                             </Typography.Text>
                           </>
                         ) : (
-                          <Card
-                            size="small"
-                            className="flex flex-col items-center justify-center text-center h-full"
-                          >
-                            <Typography.Text
-                              strong
-                              className="block"
-                              style={{ fontSize: 12 }}
-                            >
+                          <Card size="small" className="flex flex-col items-center justify-center text-center h-full">
+                            <Typography.Text strong className="block text-center" style={{ fontSize: 12 }}>
                               {nombre}
                             </Typography.Text>
-                            <Typography.Text
-                              type="secondary"
-                              style={{ fontSize: 11 }}
-                            >
-                              {media.extension?.toUpperCase() ||
-                                "Archivo"}
+                            <Typography.Text type="secondary" style={{ fontSize: 11 }}>
+                              {media.extension?.toUpperCase() || "Archivo"}
                             </Typography.Text>
                           </Card>
                         )}
@@ -267,108 +349,54 @@ export default function Formulario({
                   })}
                 </Row>
               </Image.PreviewGroup>
-            </Card>
-          </Col>
-        )}
+            </InfoCard>
+          )}
+        </Col>
 
-        <Col span={24}>
-          <Card
+        {/* Columna lateral — Asistentes */}
+        <Col xs={24} md={8} className="flex flex-col gap-4">
+          <InfoCard
             title={
-              <span>
-                <TeamOutlined className="mr-2" />
+              <span className="flex items-center gap-2">
+                <TeamOutlined style={{ color: ACCENT }} />
                 Asistentes ({evento.asistentes?.length ?? 0})
               </span>
             }
+            icon={null}
           >
-            {(evento.asistentes && evento.asistentes.length > 0) ? (
-              <Row gutter={[16, 16]}>
+            {evento.asistentes && evento.asistentes.length > 0 ? (
+              <Row gutter={[12, 12]}>
                 {evento.asistentes.map((asistente) => (
-                  <Col key={asistente.id} xs={24} sm={12} md={8} lg={6}>
-                    <Card size="small" className="h-full">
-                      <Typography.Text strong>
+                  <Col key={asistente.id} span={24}>
+                    <Card
+                      size="small"
+                      className="border-l-2"
+                      style={{ borderLeftColor: ACCENT }}
+                      bodyStyle={{ padding: "10px 12px" }}
+                    >
+                      <Typography.Text strong className="text-stone-800 text-sm block">
                         {asistente.nombre || "Sin nombre"}
                       </Typography.Text>
                       {asistente.expediente && (
-                        <>
-                          <br />
-                          <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                            Exp: {asistente.expediente}
-                          </Typography.Text>
-                        </>
+                        <Typography.Text type="secondary" className="text-xs block">
+                          Exp: {asistente.expediente}
+                        </Typography.Text>
                       )}
                       {asistente.carrera && (
-                        <>
-                          <br />
-                          <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                            {asistente.carrera}
-                          </Typography.Text>
-                        </>
+                        <Typography.Text type="secondary" className="text-xs block">
+                          {asistente.carrera}
+                        </Typography.Text>
                       )}
                     </Card>
                   </Col>
                 ))}
               </Row>
             ) : (
-              <Empty description="No hay asistentes registrados" />
+              <Empty description="No hay asistentes registrados" image={Empty.PRESENTED_IMAGE_SIMPLE} />
             )}
-          </Card>
+          </InfoCard>
         </Col>
-        
       </Row>
-
-      <FloatButton
-        icon={<EyeOutlined />}
-        onClick={() => setDrawerVisible(true)}
-        tooltip="Acceso y Visibilidad"
-        style={{ right: 24, bottom: 24 }}
-      />
-
-      <Drawer
-        title={
-          <span>
-            <TeamOutlined className="mr-2" />
-            Acceso y Visibilidad
-          </span>
-        }
-        open={drawerVisible}
-        onClose={() => setDrawerVisible(false)}
-        placement="right"
-        width={380}
-      >
-        <Descriptions column={1} size="small">
-          <Descriptions.Item label="Capacidad">
-            {evento.capacidadMinima ?? 0} –{" "}
-            {evento.capacidadMaxima ?? "Sin límite"} asistentes
-          </Descriptions.Item>
-          <Descriptions.Item
-            label={
-              <span>
-                <EyeOutlined className="mr-1" />
-                Visibilidad
-              </span>
-            }
-          >
-            {evento.visibilidad}
-          </Descriptions.Item>
-        </Descriptions>
-
-        {evento.qr && (
-          <>
-            <Divider />
-            <Typography.Text type="secondary" className="block mb-2">
-              Código QR de Acceso
-            </Typography.Text>
-            <div className="flex justify-center">
-              <QRCodeSVG
-                value={`https://eventues.app/registro-evento?id=${evento.id}`}
-                size={180}
-                fgColor="#731C38"
-                level="H"
-              />
-            </div>
-          </>
-        )}
-      </Drawer>
     </div>
   );
 }

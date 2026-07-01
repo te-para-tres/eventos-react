@@ -15,18 +15,19 @@ const LoginPage = () => {
 
   const { login, isIniciandoSesion, isAuthenticated } = useAuth();
 
-  if (isAuthenticated) {
-    return <Navigate to="/" />;
-  }
-
   const appName = import.meta.env.VITE_APP_NAME;
   const appVersion = import.meta.env.VITE_APP_VERSION;
   const appDescription = import.meta.env.VITE_APP_DESCRIPTION;
+
   useEffect(() => {
     document.title = appName;
     console.log(appName, appVersion, appDescription);
 
   }, [appName]);
+
+  if (isAuthenticated) {
+    return <Navigate to="/" />;
+  }
 
   return (
     <div className="h-screen flex">
