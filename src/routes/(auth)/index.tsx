@@ -42,7 +42,7 @@ function StatCard({
 }) {
   return (
     <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-      <Typography.Text className="block text-xs font-medium capitalize tracking-normal text-stone-500">
+      <Typography.Text className="block font-medium capitalize tracking-normal text-stone-500">
         {title}
       </Typography.Text>
       {loading ? (
@@ -74,12 +74,15 @@ function EventosPorMesChart({
     colors: [PRIMARY],
     xaxis: {
       categories: labels,
-      labels: { style: { colors: "#78716c", fontWeight: 500 } },
+      labels: {
+        style: { colors: PRIMARY, fontWeight: 500, padding: "0 0.5rem" },
+        offsetY: 4,
+      },
       axisBorder: { show: false },
       axisTicks: { show: false },
     },
     yaxis: {
-      labels: { style: { colors: "#a8a29e" } },
+      labels: { style: { colors: PRIMARY } },
       axisBorder: { show: false },
     },
     dataLabels: { enabled: false },
@@ -127,14 +130,18 @@ function TopEventosChart({
       enabled: true,
       textAnchor: "start",
       offsetX: 0,
-      style: { colors: ["#44403c"], fontWeight: 600, fontSize: "12px" },
+      style: { colors: [PRIMARY], fontWeight: 600, fontSize: "12px" },
     },
     xaxis: {
-      labels: { style: { colors: "#a8a29e" } },
+      labels: {
+        style: { colors: PRIMARY },
+        formatter: (value: string | number) =>
+          Math.round(Number(value)).toString(),
+      },
       axisBorder: { show: false },
     },
     yaxis: {
-      labels: { style: { colors: "#57534e", fontWeight: 500 } },
+      labels: { style: { colors: PRIMARY, fontWeight: 500 } },
     },
     grid: { borderColor: "#f5f5f4", strokeDashArray: 4 },
     tooltip: { theme: "light" },
@@ -202,8 +209,8 @@ function RecentEventsList({ eventos }: { eventos: any[] }) {
                     {evt.visibilidad === "publico"
                       ? "Público"
                       : evt.visibilidad === "unidad academica"
-                      ? "Unidad Académica"
-                      : "Carrera"}
+                        ? "Unidad Académica"
+                        : "Carrera"}
                   </span>
                 </div>
               </div>
@@ -373,13 +380,13 @@ function RouteComponent() {
   const eventosPorMes: { label: string; count: number }[] = [];
   for (let i = 11; i >= 0; i--) {
     const d = now.subtract(i, "month");
-    const raw = d.format("MMM YYYY");
+    const raw = d.format("MMM");
     const label = raw.charAt(0).toUpperCase() + raw.slice(1);
     eventosPorMes.push({ label, count: 0 });
   }
   for (const evt of eventosRaw) {
     if (!evt.fechaInicio) continue;
-    const keyRaw = dayjs(evt.fechaInicio).format("MMM YYYY");
+    const keyRaw = dayjs(evt.fechaInicio).format("MMM");
     const key = keyRaw.charAt(0).toUpperCase() + keyRaw.slice(1);
     const bucket = eventosPorMes.find((m) => m.label === key);
     if (bucket) bucket.count += 1;
@@ -460,7 +467,7 @@ function RouteComponent() {
             title="Eventos recientes"
             action={
               <Link
-                to="/eventos/"
+                to="/eventos"
                 className="inline-flex items-center gap-1 text-xs font-semibold transition-colors hover:opacity-80"
                 style={{ color: PRIMARY }}
               >
@@ -504,7 +511,7 @@ function RouteComponent() {
         title="Medios recientes"
         action={
           <Link
-            to="/medios/"
+            to="/medios"
             className="inline-flex items-center gap-1 text-xs font-semibold transition-colors hover:opacity-80"
             style={{ color: PRIMARY }}
           >

@@ -16,7 +16,6 @@ import dayjs from "dayjs";
 import {
   ClearOutlined,
   CloseOutlined,
-  FilterOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import { useDebouncedValue } from "@mantine/hooks";
@@ -32,7 +31,6 @@ export const Route = createFileRoute("/(auth)/eventos/")({
   ),
 });
 
-const ACCENT = "#731C38";
 
 const estadoEnum: Record<string, { text: string }> = {
   INFORMACION_BASICA: { text: "Información Básica" },
@@ -78,24 +76,6 @@ const estadoOptions = [
   ...Object.entries(estadoEnum).map(([value, { text }]) => ({ value, label: text })),
 ];
 
-function DetailLink({ id, children }: { id: any; children: React.ReactNode }) {
-  return (
-    <Link to="/eventos/detalle" search={{ id }}>
-      {children}
-    </Link>
-  );
-}
-
-function FieldLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <Typography.Text
-      className="block text-sm mb-1"
-      style={{ color: ACCENT, fontWeight: "normal" }}
-    >
-      {children}
-    </Typography.Text>
-  );
-}
 
 type Filtros = {
   idCategoriaEvento: string;
@@ -123,6 +103,7 @@ function RouteComponent() {
     (requestParams.buscar as string) ?? ""
   );
   const [debouncedBuscador] = useDebouncedValue(buscador, 400);
+  const filtrosRequestRef = useRef<Record<string, any>>({});
 
   const [filtros, setFiltros] = useState<Filtros>(() => ({
     ...emptyFiltros,
@@ -132,11 +113,6 @@ function RouteComponent() {
     estado: (requestParams.estado as string) ?? "",
     visibilidad: (requestParams.visibilidad as string) ?? "",
   }));
-
-
-  const handleAgregar = () => {
-    router.navigate({ to: "/eventos/crear" });
-  };
 
   const applyFilter = useCallback(
     (key: string, value: string | undefined) => {
@@ -174,8 +150,6 @@ function RouteComponent() {
     },
     [applyFilter, setRequestParams]
   );
-
-  const filtrosRequestRef = useRef<Record<string, any>>({});
 
   const handleLimpiarFiltros = () => {
     setBuscador("");
@@ -239,9 +213,10 @@ function RouteComponent() {
         ellipsis: true,
         search: false,
         render: (_: any, data: any) => (
-          <DetailLink id={data.id}>
+          <Link to="/eventos/detalle" search={data?.id}>
             <Typography.Text>{data.nombre || "—"}</Typography.Text>
-          </DetailLink>
+          </Link>
+
         ),
       },
       {
@@ -250,9 +225,9 @@ function RouteComponent() {
         key: "categoriaEvento.nombre",
         search: false,
         render: (_: any, data: any) => (
-          <DetailLink id={data.id}>
+          <Link to="/eventos/detalle" search={{ id: data.id }}>
             <Typography.Text>{data.categoriaEvento?.nombre || "—"}</Typography.Text>
-          </DetailLink>
+          </Link>
         ),
       },
       {
@@ -261,9 +236,9 @@ function RouteComponent() {
         key: "carrera.nombre",
         search: false,
         render: (_: any, data: any) => (
-          <DetailLink id={data.id}>
+          <Link to="/eventos/detalle" search={{ id: data.id }}>
             <Typography.Text>{data.carrera?.nombre || "—"}</Typography.Text>
-          </DetailLink>
+          </Link>
         ),
       },
       {
@@ -272,9 +247,9 @@ function RouteComponent() {
         key: "actividad.nombre",
         search: false,
         render: (_: any, data: any) => (
-          <DetailLink id={data.id}>
+          <Link to="/eventos/detalle" search={{ id: data.id }}>
             <Typography.Text>{data.actividad?.nombre || "—"}</Typography.Text>
-          </DetailLink>
+          </Link>
         ),
       },
       {
@@ -286,9 +261,9 @@ function RouteComponent() {
           const label = estadoEnum[data.estado ?? ""]?.text ?? data.estado ?? "—";
           const color = estadoColorMap[data.estado ?? ""] ?? "default";
           return (
-            <DetailLink id={data.id}>
+            <Link to="/eventos/detalle" search={{ id: data.id }}>
               <Tag color={color}>{label}</Tag>
-            </DetailLink>
+            </Link>
           );
         },
       },
@@ -304,9 +279,9 @@ function RouteComponent() {
             "—";
           const color = visibilidadColorMap[data.visibilidad ?? ""] ?? "default";
           return (
-            <DetailLink id={data.id}>
+            <Link to="/eventos/detalle" search={{ id: data.id }}>
               <Tag color={color}>{label}</Tag>
-            </DetailLink>
+            </Link>
           );
         },
       },
@@ -316,13 +291,13 @@ function RouteComponent() {
         key: "fechaInicio",
         search: false,
         render: (_: any, data: any) => (
-          <DetailLink id={data.id}>
+          <Link to="/eventos/detalle" search={{ id: data.id }}>
             <Typography.Text>
               {data.fechaInicio
                 ? dayjs(data.fechaInicio).format("DD/MM/YYYY HH:mm")
                 : "—"}
             </Typography.Text>
-          </DetailLink>
+          </Link>
         ),
       },
       {
@@ -331,13 +306,13 @@ function RouteComponent() {
         key: "fechaFin",
         search: false,
         render: (_: any, data: any) => (
-          <DetailLink id={data.id}>
+          <Link to="/eventos/detalle" search={{ id: data.id }}>
             <Typography.Text>
               {data.fechaFin
                 ? dayjs(data.fechaFin).format("DD/MM/YYYY HH:mm")
                 : "—"}
             </Typography.Text>
-          </DetailLink>
+          </Link>
         ),
       },
       {
@@ -346,11 +321,11 @@ function RouteComponent() {
         key: "capacidadMaxima",
         search: false,
         render: (_: any, data: any) => (
-          <DetailLink id={data.id}>
+          <Link to="/eventos/detalle" search={{ id: data.id }}>
             <Typography.Text>
               {data.capacidadMaxima ? `${data.capacidadMaxima} personas` : "—"}
             </Typography.Text>
-          </DetailLink>
+          </Link>
         ),
       },
     ],
@@ -397,7 +372,7 @@ function RouteComponent() {
           <CrudHeader
             titulo={ModelClass.CLASS_NAME}
             agregarLabel={`Agregar ${ModelClass.CLASS_NAME}`}
-            onAgregar={handleAgregar}
+            onAgregar={() => router.navigate({ to: "/eventos/crear" })}
           />
         </Col>
 
@@ -406,7 +381,12 @@ function RouteComponent() {
             <Row gutter={[16, 12]}>
               <Col xs={24} md={12} lg={6}>
                 <div className="flex flex-col justify-center">
-                  <FieldLabel>Buscar</FieldLabel>
+                  <Typography.Text
+                    className="block text-sm font-semibold text-[#731C38] mb-1"
+                  >
+                    Buscar
+                  </Typography.Text>
+
                   <Input
                     prefix={<SearchOutlined className="text-xs text-stone-400" />}
                     suffix={
@@ -429,7 +409,11 @@ function RouteComponent() {
 
               <Col xs={24} md={12} lg={6}>
                 <div className="flex flex-col justify-center">
-                  <FieldLabel>Categoría</FieldLabel>
+                  <Typography.Text
+                    className="block text-sm font-semibold text-[#731C38] mb-1"
+                  >
+                    Categoría
+                  </Typography.Text>
                   <SelectorQuery
                     value={filtros.idCategoriaEvento || undefined}
                     onChange={(v: string | undefined) =>
@@ -444,7 +428,7 @@ function RouteComponent() {
                       },
                     }}
                     selectProps={{
-                      placeholder: "Todas",
+                      placeholder: `Selecciona ${CategoriaEvento.CLASS_NAME}`,
                       allowClear: true,
                       className: "w-full",
                     }}
@@ -455,7 +439,11 @@ function RouteComponent() {
 
               <Col xs={24} md={12} lg={6}>
                 <div className="flex flex-col justify-center">
-                  <FieldLabel>Carrera</FieldLabel>
+                  <Typography.Text
+                    className="block text-sm font-semibold text-[#731C38] mb-1"
+                  >
+                    Carrera
+                  </Typography.Text>
                   <SelectorQuery
                     value={filtros.idCarrera || undefined}
                     onChange={(v: string | undefined) =>
@@ -470,7 +458,7 @@ function RouteComponent() {
                       },
                     }}
                     selectProps={{
-                      placeholder: "Todas",
+                      placeholder: `Selecciona ${Carrera.CLASS_NAME}`,
                       allowClear: true,
                       className: "w-full",
                     }}
@@ -481,7 +469,11 @@ function RouteComponent() {
 
               <Col xs={24} md={12} lg={6}>
                 <div className="flex flex-col justify-center">
-                  <FieldLabel>Actividad</FieldLabel>
+                  <Typography.Text
+                    className="block text-sm font-semibold text-[#731C38] mb-1"
+                  >
+                    Actividad
+                  </Typography.Text>
                   <SelectorQuery
                     value={filtros.idActividad || undefined}
                     onChange={(v: string | undefined) =>
@@ -496,7 +488,7 @@ function RouteComponent() {
                       },
                     }}
                     selectProps={{
-                      placeholder: "Todas",
+                      placeholder: `Selecciona ${Actividad.CLASS_NAME}`,
                       allowClear: true,
                       className: "w-full",
                     }}
@@ -507,7 +499,11 @@ function RouteComponent() {
 
               <Col xs={12} md={6} lg={6}>
                 <div className="flex flex-col justify-center">
-                  <FieldLabel>Estado</FieldLabel>
+                  <Typography.Text
+                    className="block text-sm font-semibold text-[#731C38] mb-1"
+                  >
+                    Estado
+                  </Typography.Text>
                   <Select
                     value={filtros.estado || undefined}
                     onChange={(v: string) => updateFiltro("estado", v ?? "")}
@@ -521,7 +517,11 @@ function RouteComponent() {
 
               <Col xs={12} md={6} lg={6}>
                 <div className="flex flex-col justify-center">
-                  <FieldLabel>Visibilidad</FieldLabel>
+                  <Typography.Text
+                    className="block text-sm font-semibold text-[#731C38] mb-1"
+                  >
+                    Visibilidad
+                  </Typography.Text>
                   <Select
                     value={filtros.visibilidad || undefined}
                     onChange={(v: string) => updateFiltro("visibilidad", v ?? "")}
@@ -535,7 +535,11 @@ function RouteComponent() {
 
               <Col xs={24} md={12} lg={6}>
                 <div className="flex flex-col justify-center">
-                  <FieldLabel>Periodo</FieldLabel>
+                  <Typography.Text
+                    className="block text-sm font-semibold text-[#731C38] mb-1"
+                  >
+                    Periodo
+                  </Typography.Text>
                   <DatePicker.RangePicker
                     value={filtros.rangoFechas ?? undefined}
                     onChange={(

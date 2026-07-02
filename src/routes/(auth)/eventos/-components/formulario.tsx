@@ -11,16 +11,19 @@ import {
   Tag,
   Typography,
 } from "antd";
-import { QRCodeSVG } from "qrcode.react";
 import {
   CalendarOutlined,
-  EnvironmentOutlined,
   EyeOutlined,
   InfoCircleOutlined,
+  LoadingOutlined,
   PictureOutlined,
   TeamOutlined,
   ToolOutlined,
 } from "@ant-design/icons";
+import { TarjetaSeccion } from "./TarjetaSeccion";
+import { TarjetaQr } from "./TarjetaQr";
+import { Material } from "@/models/Material.model";
+import { EventoMaterial } from "@/models/EventoMaterial.model";
 
 const ACCENT = "#731C38";
 
@@ -40,40 +43,14 @@ const estadoMap: Record<string, { label: string; color: string }> = {
   CANCELADO: { label: "Cancelado", color: "red" },
 };
 
-// Label sobre el valor
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
     <Typography.Text
-      className="block text-xs uppercase tracking-wide mb-1"
+      className="block text-sm font-medium tracking-wide mb-1"
       style={{ color: ACCENT }}
     >
       {children}
     </Typography.Text>
-  );
-}
-
-function InfoCard({
-  title,
-  icon,
-  children,
-}: {
-  title: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <Card
-      title={
-        <span className="flex items-center gap-2" style={{ color: ACCENT }}>
-          <span style={{ color: ACCENT }}>{icon}</span>
-          {title}
-        </span>
-      }
-      className="shadow-sm"
-      styles={{ title: { color: ACCENT, borderBottom: `2px solid ${ACCENT}30` } }}
-    >
-      {children}
-    </Card>
   );
 }
 
@@ -83,8 +60,8 @@ export default function Formulario({
 }: IFormularioBaseProps<Evento>) {
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-16">
-        <Typography.Text type="secondary">Cargando evento...</Typography.Text>
+        <div className="flex justify-center items-center py-16 w-screen h-screen">
+        <LoadingOutlined className="text-4xl"/>
       </div>
     );
   }
@@ -106,10 +83,8 @@ export default function Formulario({
       extension.toLowerCase()
     );
 
-  const qrValue = `https://eventues.app/registro-evento?id=${evento.id}`;
-
   const materialesList = evento.materiales ??
-    evento.eventoMaterial?.map((em) => ({
+    evento.eventoMaterial?.map((em: any) => ({
       ...em.material,
       cantidad: em.cantidad,
       nota: em.nota,
@@ -123,7 +98,6 @@ export default function Formulario({
 
   return (
     <div className="p-4 space-y-4">
-      {/* Imagen de portada */}
       {evento.imagenDestacada && (
         <div className="mb-6 overflow-hidden rounded-lg">
           <Image
@@ -135,24 +109,22 @@ export default function Formulario({
         </div>
       )}
 
-      {/* Título y estado */}
       <Row justify="space-between" align="middle">
         <Col>
-          <Typography.Title level={2} className="!m-0">
+          <Typography.Title level={2} className="m-0!">
             {evento.nombre || "Sin nombre"}
           </Typography.Title>
         </Col>
         <Col>
-          <Tag color={estadoInfo.color} className="text-sm px-3 py-0.5 border-0" style={{ background: `${ACCENT}15`, color: ACCENT }}>
+          <Tag color={estadoInfo.color} className="text-sm px-3 capitalize py-0.5 border-0" style={{ background: `${ACCENT}15`, color: ACCENT }}>
             {estadoInfo.label}
           </Tag>
         </Col>
       </Row>
 
       <Row gutter={[24, 24]}>
-        {/* Columna principal — Información del evento + Logística + QR */}
         <Col xs={24} md={16} className="flex flex-col gap-4">
-          <InfoCard title="Información del Evento" icon={<InfoCircleOutlined />}>
+          <TarjetaSeccion title="Información del Evento" icon={<InfoCircleOutlined />}>
             <Row gutter={[16, 8]}>
               <Col span={24} sm={12}>
                 <FieldLabel>Categoría</FieldLabel>
@@ -181,9 +153,9 @@ export default function Formulario({
                 </Typography.Text>
               </Col>
             </Row>
-          </InfoCard>
+          </TarjetaSeccion>
 
-          <InfoCard title="Logística" icon={<CalendarOutlined />}>
+          <TarjetaSeccion title="Logística" icon={<CalendarOutlined />}>
             <Row gutter={[16, 8]}>
               <Col span={24} sm={12}>
                 <FieldLabel>Unidad Académica</FieldLabel>
@@ -193,14 +165,14 @@ export default function Formulario({
               </Col>
               <Col span={24} sm={12}>
                 <FieldLabel>
-                  <EnvironmentOutlined className="mr-1" /> Lugar
+                  Lugar
                 </FieldLabel>
                 <Typography.Text className="text-stone-800 block">
                   {evento.lugar || "—"}
                 </Typography.Text>
               </Col>
               <Col span={24} sm={12}>
-                <FieldLabel>Fecha y Hora de Inicio</FieldLabel>
+                <FieldLabel>Fecha de Inicio</FieldLabel>
                 <Typography.Text className="text-stone-800 block">
                   {evento.fechaInicio
                     ? dayjs(evento.fechaInicio).format("DD/MM/YYYY HH:mm")
@@ -208,7 +180,7 @@ export default function Formulario({
                 </Typography.Text>
               </Col>
               <Col span={24} sm={12}>
-                <FieldLabel>Fecha y Hora de Fin</FieldLabel>
+                <FieldLabel>Fecha Fin</FieldLabel>
                 <Typography.Text className="text-stone-800 block">
                   {evento.fechaFin
                     ? dayjs(evento.fechaFin).format("DD/MM/YYYY HH:mm")
@@ -224,10 +196,9 @@ export default function Formulario({
                 </Col>
               )}
             </Row>
-          </InfoCard>
+          </TarjetaSeccion>
 
-          {/* Acceso y QR — ahora inline */}
-          <InfoCard title="Acceso y QR" icon={<EyeOutlined />}>
+          <TarjetaSeccion title="Acceso y QR" icon={<EyeOutlined />}>
             <Row gutter={[16, 8]} align="middle">
               <Col xs={24} sm={8}>
                 <FieldLabel>Capacidad</FieldLabel>
@@ -242,54 +213,22 @@ export default function Formulario({
                 </Typography.Text>
               </Col>
               <Col xs={24} sm={8}>
-                {evento.qr ? (
-                  <div className="flex flex-col items-center">
-                    <Typography.Text className="text-xs text-stone-400 mb-1 block text-center">
-                      Código QR de Acceso
-                    </Typography.Text>
-                    <QRCodeSVG
-                      value={qrValue}
-                      size={100}
-                      fgColor={ACCENT}
-                      level="H"
-                    />
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center">
-                    <Typography.Text className="text-xs text-stone-400 mb-1 block text-center">
-                      Código QR de Acceso
-                    </Typography.Text>
-                    <QRCodeSVG
-                      value={qrValue}
-                      size={100}
-                      fgColor={ACCENT}
-                      level="L"
-                      style={{ opacity: 0.4 }}
-                    />
-                    <Typography.Text className="text-xs text-stone-400 mt-1 text-center">
-                      QR pendiente
-                    </Typography.Text>
-                  </div>
-                )}
+                <TarjetaQr evento={evento} />
               </Col>
             </Row>
-          </InfoCard>
+          </TarjetaSeccion>
 
-          {/* Materiales */}
           {(materialesList.length > 0) && (
-            <InfoCard title="Materiales Requeridos" icon={<ToolOutlined />}>
+            <TarjetaSeccion title="Materiales Requeridos" icon={<ToolOutlined />}>
               <Row gutter={[12, 12]}>
                 {materialesList.map((m) => (
                   <Col key={m.id} xs={24} sm={12} md={8}>
                     <Card size="small" className="h-full border-l-2" style={{ borderLeftColor: ACCENT }}>
                       <Typography.Text strong className="text-stone-800 block">
-                        {m.nombre || "Material"}
-                      </Typography.Text>
-                      <Typography.Text type="secondary" className="text-xs block">
-                        Cantidad: {m.cantidad ?? "—"}
+                        {m.nombre || "Material"}: <span className="text-[#731C38]">{m.cantidad ?? "—"}</span>
                       </Typography.Text>
                       {m.nota && (
-                        <Typography.Text type="secondary" className="text-xs block mt-1">
+                        <Typography.Text type="secondary" className="block mt-1">
                           {m.nota}
                         </Typography.Text>
                       )}
@@ -297,12 +236,11 @@ export default function Formulario({
                   </Col>
                 ))}
               </Row>
-            </InfoCard>
+            </TarjetaSeccion>
           )}
 
-          {/* Galería */}
           {mediosList.length > 0 && (
-            <InfoCard title="Galería de Imágenes y Anexos" icon={<PictureOutlined />}>
+            <TarjetaSeccion title="Galería de Imágenes y Anexos" icon={<PictureOutlined />}>
               <Image.PreviewGroup>
                 <Row gutter={[16, 16]}>
                   {mediosList.map((media: any) => {
@@ -349,13 +287,12 @@ export default function Formulario({
                   })}
                 </Row>
               </Image.PreviewGroup>
-            </InfoCard>
+            </TarjetaSeccion>
           )}
         </Col>
 
-        {/* Columna lateral — Asistentes */}
         <Col xs={24} md={8} className="flex flex-col gap-4">
-          <InfoCard
+          <TarjetaSeccion
             title={
               <span className="flex items-center gap-2">
                 <TeamOutlined style={{ color: ACCENT }} />
@@ -374,16 +311,11 @@ export default function Formulario({
                       style={{ borderLeftColor: ACCENT }}
                       bodyStyle={{ padding: "10px 12px" }}
                     >
-                      <Typography.Text strong className="text-stone-800 text-sm block">
-                        {asistente.nombre || "Sin nombre"}
+                      <Typography.Text strong className="text-stone-800 block">
+                        {asistente.nombre || "Sin nombre"} <span className="text-[#731C38] font-medium block">({asistente.expediente})</span>
                       </Typography.Text>
-                      {asistente.expediente && (
-                        <Typography.Text type="secondary" className="text-xs block">
-                          Exp: {asistente.expediente}
-                        </Typography.Text>
-                      )}
                       {asistente.carrera && (
-                        <Typography.Text type="secondary" className="text-xs block">
+                        <Typography.Text type="secondary" className="block">
                           {asistente.carrera}
                         </Typography.Text>
                       )}
@@ -394,7 +326,7 @@ export default function Formulario({
             ) : (
               <Empty description="No hay asistentes registrados" image={Empty.PRESENTED_IMAGE_SIMPLE} />
             )}
-          </InfoCard>
+          </TarjetaSeccion>
         </Col>
       </Row>
     </div>
