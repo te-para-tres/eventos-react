@@ -1,6 +1,7 @@
 import { ModelColumnsType } from "@base/interfaces/models/types/model-columns.type";
 import { ModeloBase } from "@base/interfaces/models/modelo-base.model";
 import { Material } from "./Material.model";
+import { Evento } from "./Evento.model";
 
 export class EventoMaterial extends ModeloBase {
   idEvento?: string;

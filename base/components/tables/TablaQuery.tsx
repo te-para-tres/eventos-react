@@ -55,6 +55,7 @@ export function TablaQuery<T = any>({
       queryProps?.queryKey ?? queryProps.endpoint,
       queryProps.extraParams,
       queryProps,
+      http,
     ],
     queryFn: () =>
       http.get({

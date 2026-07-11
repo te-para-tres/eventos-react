@@ -107,7 +107,7 @@ function RouteComponent({ onSelectMedia, onSelectMultiple, multiple = false }: P
   }, [multiple]);
 
   const mediasQuery = useQuery({
-    queryKey: [ModelClass.ENDPOINTS.DEFAULT, requestParams],
+    queryKey: [ModelClass.ENDPOINTS.DEFAULT, requestParams, http],
     queryFn: () => http.get({ endpoint: ModelClass.ENDPOINTS.DEFAULT, params: { ...requestParams, limite: -1 } }),
   });
 
@@ -214,7 +214,7 @@ function RouteComponent({ onSelectMedia, onSelectMultiple, multiple = false }: P
                     }}
                     action={`${VITE_ENV.BASE_API_URL}/v1/subir-archivo.json`}
                     headers={{ Authorization: `Bearer ${token}`.replace(/"/g, "") }}
-                    className="[&_.ant-upload]:!block [&_.ant-upload]:!w-full [&_.ant-upload]:!cursor-pointer [&_.ant-upload]:!bg-transparent [&_.ant-upload]:!border-0 [&_.ant-upload]:!p-0"
+                    className="[&_.ant-upload]:block! [&_.ant-upload]:w-full! [&_.ant-upload]:cursor-pointer! [&_.ant-upload]:bg-transparent! [&_.ant-upload]:border-0! [&_.ant-upload]:p-0!"
                   >
                     <div className="flex flex-col items-center gap-3 text-center">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-900 text-white transition-transform hover:-translate-y-0.5">

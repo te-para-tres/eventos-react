@@ -80,6 +80,7 @@ export function SelectorQuery({
       queryProps?.queryKey ?? queryProps.endpoint,
       requestParams,
       queryProps,
+      http,
     ],
     queryFn: () =>
       http.get({

@@ -29,6 +29,7 @@ export function useDetalle<T = any>({
       queryProps?.extraParams,
       queryProps,
       isEditando,
+      http,
     ],
     queryFn: () =>
       http.get({
