@@ -108,7 +108,11 @@ function RouteComponent({ onSelectMedia, onSelectMultiple, multiple = false }: P
 
   const mediasQuery = useQuery({
     queryKey: [ModelClass.ENDPOINTS.DEFAULT, requestParams, http],
-    queryFn: () => http.get({ endpoint: ModelClass.ENDPOINTS.DEFAULT, params: { ...requestParams, limite: -1 } }),
+    queryFn: () => http.get({
+      endpoint: ModelClass.ENDPOINTS.DEFAULT,
+      params: { ...requestParams, limite: -1 },
+      showNotificacion: true,
+    }),
   });
 
   const media = useMemo(
@@ -203,13 +207,30 @@ function RouteComponent({ onSelectMedia, onSelectMultiple, multiple = false }: P
                     showUploadList={false}
                     name="archivo"
                     multiple
-                    onChange={(v) => {
-                      if (v.file.status === "done") {
-                        mediasQuery.refetch();
+                    onChange={(info) => {
+                      if (info.file.status === "done") {
                         notification.success({
                           message: "Archivo subido",
-                          description: v.file.name,
+                          description: info.file.name,
                         });
+                      }
+
+                      if (info.file.status === "error") {
+                        notification.error({
+                          message: "No se pudo subir el archivo",
+                          description: info.file.name,
+                        });
+                      }
+
+                      const cargasTerminadas = info.fileList.every(
+                        ({ status }) =>
+                          status === "done" ||
+                          status === "error" ||
+                          status === "removed"
+                      );
+
+                      if (info.fileList.length > 0 && cargasTerminadas) {
+                        void mediasQuery.refetch();
                       }
                     }}
                     action={`${VITE_ENV.BASE_API_URL}/v1/subir-archivo.json`}
