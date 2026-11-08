@@ -1,6 +1,6 @@
 import { EdForm } from "@base/components/form/Form";
 import { AntdFormValidation } from "@base/constants/antd-form-validation";
-import { Button, Checkbox, Col, Form, Row, Select } from "antd";
+import { Button, Col, Form, Row, Switch } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { IFormularioBaseProps } from "@base/interfaces/forms/FormularioBase.interface";
 import { TextInput } from "@base/components/form/TextInput/TextInput";
@@ -18,16 +18,6 @@ export default function Formulario({
 }: IFormularioBaseProps) {
   const [form] = useForm();
   const [estado, setEstado] = useState<boolean>();
-  const tipos = [
-    {
-      label: "Licenciatura",
-      value: "licenciatura"
-    },
-    {
-      label: "Ingeniería",
-      value: "ingenieria"
-    }
-  ];
 
   useEffect(() => {
     if (modelo) {
@@ -45,7 +35,7 @@ export default function Formulario({
         formProps.onFinish?.(v);
       }}
     >
-      <Row gutter={[24, 16]}>
+      <Row gutter={[24, 18]}>
         <Col span={24} md={10}>
           <Form.Item
             label="Nombre"
@@ -72,11 +62,13 @@ export default function Formulario({
             name="estado"
           >
             <Row>
-              <Checkbox
-                checked={estado}
-                onChange={() => setEstado((prev) => !prev)}
+              <Switch
+                aria-label="Estado activo"
+                checked={estado ?? false}
+                checkedChildren="Activo"
+                unCheckedChildren="Inactivo"
+                onChange={setEstado}
               />
-              <p style={{ marginLeft: "10px" }}>Activo</p>
             </Row>
           </Form.Item>
         </Col>

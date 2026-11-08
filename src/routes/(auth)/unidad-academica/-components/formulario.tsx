@@ -1,6 +1,6 @@
 import { EdForm } from "@base/components/form/Form";
 import { AntdFormValidation } from "@base/constants/antd-form-validation";
-import { Button, Checkbox, Col, Form, Row, Typography } from "antd";
+import { Button, Col, Form, Row, Switch } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { IFormularioBaseProps } from "@base/interfaces/forms/FormularioBase.interface";
 import { TextInput } from "@base/components/form/TextInput/TextInput";
@@ -33,7 +33,7 @@ export default function Formulario({
         formProps.onFinish?.(v);
       }}
     >
-      <Row gutter={[24, 16]}>
+      <Row gutter={[24, 18]}>
         <Col span={24} md={12}>
           <Form.Item
             label="Nombre"
@@ -67,12 +67,14 @@ export default function Formulario({
 
         <Col span={24} md={12}>
           <Form.Item label="Estado">
-            <Row align="middle" gutter={8}>
-              <Checkbox
+            <Row align="middle" gutter={6}>
+              <Switch
+                aria-label="Estado activo"
                 checked={estado}
-                onChange={() => setEstado((prev) => !prev)}
+                checkedChildren="Activo"
+                unCheckedChildren="Inactivo"
+                onChange={setEstado}
               />
-              <Typography.Text className="text-stone-700">Activo</Typography.Text>
             </Row>
           </Form.Item>
         </Col>
