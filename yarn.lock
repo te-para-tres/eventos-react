@@ -1384,7 +1384,7 @@
   dependencies:
     "@tanstack/query-core" "5.91.0"
 
-"@tanstack/react-router-devtools@1.166.9":
+"@tanstack/react-router-devtools@^1.166.9":
   version "1.166.9"
   resolved "https://registry.yarnpkg.com/@tanstack/react-router-devtools/-/react-router-devtools-1.166.9.tgz#fb97cd3791a35ec9db77968c0f2f867fce271b83"
   integrity sha512-O49eZmaeEKB5YnKH/qd61AbxV/lW8ICm4stfZ4GNQNpzQQ6rhPIB0p3PMZDIgX+6DoMivdNvLRmXAOOpzpIpDg==
@@ -1439,15 +1439,6 @@
     clsx "^2.1.1"
     goober "^2.1.16"
     tiny-invariant "^1.3.3"
-
-"@tanstack/router-devtools@^1.115.2":
-  version "1.166.9"
-  resolved "https://registry.yarnpkg.com/@tanstack/router-devtools/-/router-devtools-1.166.9.tgz#6fb630d268aeaba02c23da20b431f6ab85990129"
-  integrity sha512-AOZWjCju4jpEw/zE/hapo5slmM7RTAGMB5zNeo60ZOFr+Tkrt0utxOGTJ0mVDTKyBA1DGnyryAced3rBulT19A==
-  dependencies:
-    "@tanstack/react-router-devtools" "1.166.9"
-    clsx "^2.1.1"
-    goober "^2.1.16"
 
 "@tanstack/router-generator@1.166.13":
   version "1.166.13"
