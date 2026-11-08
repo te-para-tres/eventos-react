@@ -8,9 +8,11 @@ import {
   Empty,
   Image,
   Row,
+  Table,
   Tag,
   Typography,
 } from "antd";
+import type { TableColumnsType } from "antd";
 import {
   CalendarOutlined,
   EyeOutlined,
@@ -22,8 +24,9 @@ import {
 } from "@ant-design/icons";
 import { TarjetaSeccion } from "./TarjetaSeccion";
 import { TarjetaQr } from "./TarjetaQr";
-import { Material } from "@/models/Material.model";
-import { EventoMaterial } from "@/models/EventoMaterial.model";
+import type { Asistente } from "@/models/Asistente.model";
+import { ExportarAsistentesButton } from "./ExportarAsistentesButton";
+import { obtenerCarrera } from "./exportarAsistentes";
 
 const ACCENT = "#731C38";
 
@@ -43,10 +46,36 @@ const estadoMap: Record<string, { label: string; color: string }> = {
   CANCELADO: { label: "Cancelado", color: "red" },
 };
 
+const columnasAsistentes: TableColumnsType<Asistente> = [
+  {
+    title: "Nombre",
+    dataIndex: "nombre",
+    key: "nombre",
+    render: (nombre: string | undefined) => nombre || "Sin nombre",
+  },
+  {
+    title: "Expediente",
+    dataIndex: "expediente",
+    key: "expediente",
+    render: (expediente: string | undefined) => expediente || "—",
+  },
+  {
+    title: "Correo electrónico",
+    dataIndex: "correo",
+    key: "correo",
+    render: (correo: string | undefined) => correo || "—",
+  },
+  {
+    title: "Carrera",
+    key: "carrera",
+    render: (_valor, asistente) => obtenerCarrera(asistente),
+  },
+];
+
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
     <Typography.Text
-      className="block text-sm font-medium tracking-wide mb-1"
+      className="block text-sm font-medium tracking-wide mb-1.5"
       style={{ color: ACCENT }}
     >
       {children}
@@ -60,7 +89,7 @@ export default function Formulario({
 }: IFormularioBaseProps<Evento>) {
   if (isLoading) {
     return (
-        <div className="flex justify-center items-center py-16 w-screen h-screen">
+        <div className="flex justify-center items-center py-15 w-screen h-screen">
         <LoadingOutlined className="text-4xl"/>
       </div>
     );
@@ -97,7 +126,7 @@ export default function Formulario({
     [];
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-3 space-y-3">
       {evento.imagenDestacada && (
         <div className="mb-6 overflow-hidden rounded-lg">
           <Image
@@ -116,16 +145,16 @@ export default function Formulario({
           </Typography.Title>
         </Col>
         <Col>
-          <Tag color={estadoInfo.color} className="text-sm px-3 capitalize py-0.5 border-0" style={{ background: `${ACCENT}15`, color: ACCENT }}>
+          <Tag color={estadoInfo.color} className="text-sm px-3 capitalize py-1.5 border-0" style={{ background: `${ACCENT}15`, color: ACCENT }}>
             {estadoInfo.label}
           </Tag>
         </Col>
       </Row>
 
       <Row gutter={[24, 24]}>
-        <Col xs={24} md={16} className="flex flex-col gap-4">
+        <Col span={24} className="flex flex-col gap-3">
           <TarjetaSeccion title="Información del Evento" icon={<InfoCircleOutlined />}>
-            <Row gutter={[16, 8]}>
+            <Row gutter={[18, 12]}>
               <Col span={24} sm={12}>
                 <FieldLabel>Categoría</FieldLabel>
                 <Typography.Text className="text-stone-800 block">
@@ -156,7 +185,7 @@ export default function Formulario({
           </TarjetaSeccion>
 
           <TarjetaSeccion title="Logística" icon={<CalendarOutlined />}>
-            <Row gutter={[16, 8]}>
+            <Row gutter={[18, 12]}>
               <Col span={24} sm={12}>
                 <FieldLabel>Unidad Académica</FieldLabel>
                 <Typography.Text className="text-stone-800 block">
@@ -199,7 +228,7 @@ export default function Formulario({
           </TarjetaSeccion>
 
           <TarjetaSeccion title="Acceso y QR" icon={<EyeOutlined />}>
-            <Row gutter={[16, 8]} align="middle">
+            <Row gutter={[18, 12]} align="middle">
               <Col xs={24} sm={8}>
                 <FieldLabel>Capacidad</FieldLabel>
                 <Typography.Text className="text-stone-800">
@@ -228,7 +257,7 @@ export default function Formulario({
                         {m.nombre || "Material"}: <span className="text-[#731C38]">{m.cantidad ?? "—"}</span>
                       </Typography.Text>
                       {m.nota && (
-                        <Typography.Text type="secondary" className="block mt-1">
+                        <Typography.Text type="secondary" className="block mt-1.5">
                           {m.nota}
                         </Typography.Text>
                       )}
@@ -242,7 +271,7 @@ export default function Formulario({
           {mediosList.length > 0 && (
             <TarjetaSeccion title="Galería de Imágenes y Anexos" icon={<PictureOutlined />}>
               <Image.PreviewGroup>
-                <Row gutter={[16, 16]}>
+                <Row gutter={[18, 18]}>
                   {mediosList.map((media: any) => {
                     if (!media) return null;
                     const ruta = media.ruta;
@@ -265,7 +294,7 @@ export default function Formulario({
                               }}
                             />
                             <Typography.Text
-                              className="block text-center mt-1"
+                              className="block text-center mt-1.5"
                               style={{ fontSize: 12 }}
                               ellipsis
                             >
@@ -291,44 +320,38 @@ export default function Formulario({
           )}
         </Col>
 
-        <Col xs={24} md={8} className="flex flex-col gap-4">
-          <TarjetaSeccion
-            title={
-              <span className="flex items-center gap-2">
-                <TeamOutlined style={{ color: ACCENT }} />
-                Asistentes ({evento.asistentes?.length ?? 0})
-              </span>
-            }
-            icon={null}
-          >
-            {evento.asistentes && evento.asistentes.length > 0 ? (
-              <Row gutter={[12, 12]}>
-                {evento.asistentes.map((asistente) => (
-                  <Col key={asistente.id} span={24}>
-                    <Card
-                      size="small"
-                      className="border-l-2"
-                      style={{ borderLeftColor: ACCENT }}
-                      bodyStyle={{ padding: "10px 12px" }}
-                    >
-                      <Typography.Text strong className="text-stone-800 block">
-                        {asistente.nombre || "Sin nombre"} <span className="text-[#731C38] font-medium block">({asistente.expediente})</span>
-                      </Typography.Text>
-                      {asistente.carrera && (
-                        <Typography.Text type="secondary" className="block">
-                          {asistente.carrera}
-                        </Typography.Text>
-                      )}
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            ) : (
-              <Empty description="No hay asistentes registrados" image={Empty.PRESENTED_IMAGE_SIMPLE} />
-            )}
-          </TarjetaSeccion>
-        </Col>
       </Row>
+
+      <TarjetaSeccion
+        title={`Asistentes registrados (${evento.asistentes?.length ?? 0})`}
+        icon={<TeamOutlined />}
+      >
+        <div className="mb-3 flex justify-end">
+          <ExportarAsistentesButton evento={evento} />
+        </div>
+        <Table<Asistente>
+          rowKey={(asistente) =>
+            asistente.id || `${asistente.expediente}-${asistente.correo}`
+          }
+          columns={columnasAsistentes}
+          dataSource={evento.asistentes ?? []}
+          locale={{
+            emptyText: (
+              <Empty
+                description="No hay asistentes registrados"
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              />
+            ),
+          }}
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            pageSizeOptions: [10, 25, 50],
+            showTotal: (total) => `${total} asistentes`,
+          }}
+          scroll={{ x: true }}
+        />
+      </TarjetaSeccion>
     </div>
   );
 }

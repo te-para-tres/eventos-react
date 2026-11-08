@@ -79,7 +79,7 @@ function RouteComponent() {
   const [eventoCreadoId, setEventoCreadoId] = useState<string | number | null>(null);
   const [modalQrAbierto, setModalQrAbierto] = useState(false);
   const [creandoEvento, setCreandoEvento] = useState(false);
-  const [perteneceActividad, setPerteneceActividad] = useState(false);
+  const [perteneceActividad] = useState(false);
   const [resumen, setResumen] = useState<{ titulo?: string; fecha?: string; hora?: string; ubicacion?: string }>();
 
   const siguiente = async (e?: React.MouseEvent) => {
@@ -134,15 +134,15 @@ function RouteComponent() {
   return (
     <PaginaProvider titulo="Crear Evento">
       <DefaultContainer className="h-full">
-        <div className="flex justify-center items-center w-full h-auto px-20 py-8">
+        <div className="flex justify-center items-center w-full h-auto px-18 py-6">
           <Row className="w-full h-auto max-w-5xl">
             <Col span={24} className="flex flex-col justify-center items-center mb-12 w-full h-auto">
               <Typography.Title level={2}>Crear Nuevo Evento</Typography.Title>
-              <Typography.Text className="text-stone-400 pt-2">
+              <Typography.Text className="text-stone-400 pt-3">
                 Complete los detalles a continuación para comenzar a planificar su evento
               </Typography.Text>
               <ConfigProvider theme={{ token: { colorPrimary: ACCENT } }}>
-                <Steps current={pasoActual} items={pasosConfig} className="pt-8" />
+                <Steps current={pasoActual} items={pasosConfig} className="pt-6" />
               </ConfigProvider>
             </Col>
 
@@ -152,10 +152,10 @@ function RouteComponent() {
                   Paso {pasoActual + 1}: {pasosConfig[pasoActual].title}
                 </Typography.Title>
                 <Typography.Text className="text-stone-400">{pasosConfig[pasoActual].subtitulo}</Typography.Text>
-                <Form layout="vertical" autoComplete="true" form={form} className="w-full h-auto pt-2" preserve onFinish={handleOnFinish}>
+                <Form layout="vertical" autoComplete="true" form={form} className="w-full h-auto pt-3" preserve onFinish={handleOnFinish}>
                   {/* Paso 0 — Información Básica */}
                   <div style={{ display: pasoActual === 0 ? "block" : "none" }}>
-                    <Row gutter={[10, 10]}>
+                    <Row gutter={[12, 12]}>
                       <Col span={24}>
                         <Form.Item label="Título del Evento" name="nombre" rules={[AntdFormValidation.Requerido("El título es obligatorio")]}>
                           <TextInput onChange={(e) => setResumen((prev) => ({ ...prev, titulo: e.target.value }))} placeholder="Ej. Feria Anual de Ciencias y Tecnología" />
@@ -179,7 +179,7 @@ function RouteComponent() {
                       <Col span={24}>
                         <Form.Item label="Imagen de Portada" name="idImagenDestacada">
                           <div className="flex flex-col gap-3">
-                            <Button icon={<CloudUploadOutlined />} onClick={() => setModalMediaAbierto(true)} className="w-1/4 h-auto py-1">
+                            <Button icon={<CloudUploadOutlined />} onClick={() => setModalMediaAbierto(true)} className="w-1/4 h-auto py-1.5">
                               Establecer imagen
                             </Button>
                             {imagenPrincipal && (
@@ -188,7 +188,7 @@ function RouteComponent() {
                                 <button type="button" onClick={() => setImagenPrincipal(null)} className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm transition-colors hover:bg-red-500 hover:text-white">
                                   <CloseOutlined style={{ fontSize: 10 }} />
                                 </button>
-                                <Typography.Text className="absolute bottom-0 left-0 right-0 truncate bg-black/50 px-3 py-1 text-xs text-white">{imagenPrincipal.nombre}</Typography.Text>
+                                <Typography.Text className="absolute bottom-0 left-0 right-0 truncate bg-black/50 px-3 py-1.5 text-xs text-white">{imagenPrincipal.nombre}</Typography.Text>
                               </div>
                             )}
                           </div>
@@ -199,7 +199,7 @@ function RouteComponent() {
 
                   {/* Paso 1 — Logística */}
                   <div style={{ display: pasoActual === 1 ? "block" : "none" }}>
-                    <Row gutter={[10, 10]}>
+                    <Row gutter={[12, 12]}>
                       <Col span={24} sm={12}>
                         <Form.Item label="Unidad Académica" name="idUnidadAcademica" rules={[AntdFormValidation.Requerido("La unidad académica es obligatoria")]}>
                           <SelectorQuery queryProps={{ endpoint: UnidadAcademica.ENDPOINTS.DEFAULT, enabled: true, extraParams: { ordenar: "nombre-asc" } }} />
@@ -231,7 +231,7 @@ function RouteComponent() {
 
                   {/* Paso 2 — Visibilidad */}
                   <div style={{ display: pasoActual === 2 ? "block" : "none" }}>
-                    <Row gutter={[10, 10]}>
+                    <Row gutter={[12, 12]}>
                       <Col sm={12} span={24}>
                         <Form.Item label="Mínimo de asistentes" name="capacidadMinima" rules={[AntdFormValidation.Requerido("El mínimo es obligatorio")]}>
                           <TextInput type="number" placeholder="Ej: 10" />
@@ -244,8 +244,8 @@ function RouteComponent() {
                       </Col>
                       <Divider />
                       <Col span={24}>
-                        <Typography.Title level={4} className="flex items-center mb-4 text-zinc-600">
-                          <Icon icon="lucide:eye" className="inline-block mr-2" /> Privacidad y Visibilidad
+                        <Typography.Title level={4} className="flex items-center mb-3 text-zinc-600">
+                          <Icon icon="lucide:eye" className="inline-block mr-1.5" /> Privacidad y Visibilidad
                         </Typography.Title>
                         <Form.Item name="visibilidad" rules={[AntdFormValidation.Requerido("La visibilidad es obligatoria")]} className="mb-0">
                           <input type="hidden" />
@@ -254,8 +254,8 @@ function RouteComponent() {
                       {estatusEventos.map((estatus, index) => (
                         <Col key={index} sm={8} span={24}>
                           <Card onClick={() => { setEstado(estatus.valor); form.setFieldValue("visibilidad", estatus.valor); void form.validateFields(["visibilidad"]); }}
-                            className={`cursor-pointer flex flex-col justify-center items-start gap-4 border-2 ${estado === estatus.valor ? "bg-[#f8f1f1] border-red-900" : ""} w-full h-auto`}>
-                            <Icon icon={estatus.icono} className="inline-block text-red-900 text-3xl mb-2" />
+                            className={`cursor-pointer flex flex-col justify-center items-start gap-3 border-2 ${estado === estatus.valor ? "bg-[#f8f1f1] border-red-900" : ""} w-full h-auto`}>
+                            <Icon icon={estatus.icono} className="inline-block text-red-900 text-3xl mb-1.5" />
                             <Typography.Title level={5}>{estatus.titulo}</Typography.Title>
                             <Typography.Text className="text-zinc-400">{estatus.descripcion}</Typography.Text>
                           </Card>
@@ -266,35 +266,35 @@ function RouteComponent() {
 
                   {/* Paso 3 — Revisión */}
                   <div style={{ display: pasoActual === 3 ? "block" : "none" }}>
-                    <Row gutter={[16, 16]}>
+                    <Row gutter={[18, 18]}>
                       <Col xs={24} md={16}>
                         <Card>
                           <Row justify="space-between" align="middle" className="mb-6">
                             <Typography.Title level={4} className="flex items-center m-0 text-zinc-800">
                               <FileTextOutlined className="mr-3 text-[#731C38] text-2xl" /> Resumen del Evento
                             </Typography.Title>
-                            <Button type="link" onClick={() => setPasoActual(0)} icon={<EditOutlined />} className="text-[#731C38] font-medium hover:text-red-900 flex items-center gap-1">
+                            <Button type="link" onClick={() => setPasoActual(0)} icon={<EditOutlined />} className="text-[#731C38] font-medium hover:text-red-900 flex items-center gap-1.5">
                               Editar todo
                             </Button>
                           </Row>
                           <Col span={24} className="flex flex-col gap-0">
-                            <Row className="py-5 border-b border-zinc-50 hover:bg-zinc-50/50 transition-colors px-2 rounded-md">
+                            <Row className="py-6 border-b border-zinc-50 hover:bg-zinc-50/50 transition-colors px-1.5 rounded-md">
                               <Col span={8}><Typography.Text className="text-zinc-400 font-medium">Título</Typography.Text></Col>
                               <Col span={16}><Typography.Text strong className="text-zinc-800 text-base">{resumen?.titulo || "—"}</Typography.Text></Col>
                             </Row>
-                            <Row className="py-5 border-b border-zinc-50 hover:bg-zinc-50/50 transition-colors px-2 rounded-md">
+                            <Row className="py-6 border-b border-zinc-50 hover:bg-zinc-50/50 transition-colors px-1.5 rounded-md">
                               <Col span={8}><Typography.Text className="text-zinc-400 font-medium">Fecha y Hora</Typography.Text></Col>
                               <Col span={16}><Typography.Text strong className="text-zinc-800">{resumen?.fecha} {resumen?.hora ? ` • ${resumen?.hora}` : ""}</Typography.Text></Col>
                             </Row>
-                            <Row className="py-5 border-b border-zinc-50 hover:bg-zinc-50/50 transition-colors px-2 rounded-md">
+                            <Row className="py-6 border-b border-zinc-50 hover:bg-zinc-50/50 transition-colors px-1.5 rounded-md">
                               <Col span={8}><Typography.Text className="text-zinc-400 font-medium">Ubicación</Typography.Text></Col>
                               <Col span={16}><Typography.Text strong className="text-[#8B1D3D] text-base">{resumen?.ubicacion || "—"}</Typography.Text></Col>
                             </Row>
-                            <Row className="py-5 hover:bg-zinc-50/50 transition-colors px-2 rounded-md">
+                            <Row className="py-6 hover:bg-zinc-50/50 transition-colors px-1.5 rounded-md">
                               <Col span={8}><Typography.Text className="text-zinc-400 font-medium">Visibilidad</Typography.Text></Col>
                               <Col span={16}>
                                 {estado ? (
-                                  <span className="bg-emerald-50 text-emerald-700 px-4 py-1.5 rounded-full text-sm font-semibold border border-emerald-100 uppercase tracking-wide">
+                                  <span className="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-sm font-semibold border border-emerald-100 uppercase tracking-wide">
                                     {estatusEventos.find((e) => e.valor === estado)?.titulo || estado}
                                   </span>
                                 ) : (
@@ -311,14 +311,14 @@ function RouteComponent() {
                           <Space direction="vertical" size="middle" className="w-full">
                             <Card className="flex flex-col justify-center items-center border-stone-400 bg-stone-50 w-full h-auto" style={{ minHeight: 180 }}>
                               {qrUrl ? (
-                                <div className="flex flex-col items-center gap-3 py-4">
+                                <div className="flex flex-col items-center gap-3 py-3">
                                   <Typography.Text strong className="text-[#731C38]">Generación de QR</Typography.Text>
                                   <QRCodeSVG value={qrUrl} size={140} bgColor="#f8f8f8" fgColor="#731C38" level="H" includeMargin />
-                                  <Typography.Text className="text-xs text-zinc-400 text-center break-all px-2">Acceso a {qrUrl}</Typography.Text>
+                                  <Typography.Text className="text-xs text-zinc-400 text-center break-all px-1.5">Acceso a {qrUrl}</Typography.Text>
                                   <Button size="small" danger onClick={() => setQrUrl(null)}>Limpiar QR</Button>
                                 </div>
                               ) : eventoCreadoId ? (
-                                <div className="flex flex-col items-center gap-3 py-4">
+                                <div className="flex flex-col items-center gap-3 py-3">
                                   <Typography.Text className="text-zinc-500 text-sm text-center">El evento fue creado. Puedes generar el acceso QR cuando lo necesites.</Typography.Text>
                                   <Button icon={<KeyOutlined />} onClick={generarQr}>Generar QR de Acceso</Button>
                                 </div>
@@ -332,24 +332,24 @@ function RouteComponent() {
                       </Col>
                     </Row>
 
-                    <Row gutter={[16, 16]} className="mt-3">
+                    <Row gutter={[18, 18]} className="mt-3">
                       <Col span={24}>
                         <Card>
-                          <Typography.Title level={4} className="flex items-center m-0 text-zinc-800 mb-4">
+                          <Typography.Title level={4} className="flex items-center m-0 text-zinc-800 mb-3">
                             <LinkOutlined className="mr-3 text-[#731C38] text-2xl" /> Flyers Digitales y Anexos
                           </Typography.Title>
-                          <Typography.Text className="text-zinc-400 mb-4">Carga el material visual oficial y documentos adicionales (PDF, JPG, PNG)</Typography.Text>
+                          <Typography.Text className="text-zinc-400 mb-3">Carga el material visual oficial y documentos adicionales (PDF, JPG, PNG)</Typography.Text>
                           <Form.Item className="w-full h-auto">
                             <div className="flex flex-col gap-3">
-                              <Button icon={<CloudUploadOutlined />} onClick={() => setModalAnexosAbierto(true)} className="w-auto h-auto py-1 mt-2">Agregar Anexos al Evento</Button>
-                              <div className="grid sm:grid-cols-4 gap-4 w-full h-auto">
+                              <Button icon={<CloudUploadOutlined />} onClick={() => setModalAnexosAbierto(true)} className="w-auto h-auto py-1.5 mt-1.5">Agregar Anexos al Evento</Button>
+                              <div className="grid sm:grid-cols-4 gap-3 w-full h-auto">
                                 {anexos.map((anexo) => (
                                   <div key={anexo.id} className="relative w-56 aspect-[4/3] overflow-hidden rounded-lg border border-slate-200 bg-slate-50 shadow-sm">
                                     <img src={`${VITE_ENV.BASE_API_URL}/recursos/${anexo.ruta}`} alt={anexo.nombre} className="h-full w-full object-contain" />
                                     <button type="button" onClick={() => setAnexos((prev) => prev.filter((a) => a.id !== anexo.id))} className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm transition-colors hover:bg-red-500 hover:text-white">
                                       <CloseOutlined style={{ fontSize: 10 }} />
                                     </button>
-                                    <Typography.Text className="absolute bottom-0 left-0 right-0 truncate bg-black/50 px-3 py-1 text-xs text-white">{anexo.nombre}</Typography.Text>
+                                    <Typography.Text className="absolute bottom-0 left-0 right-0 truncate bg-black/50 px-3 py-1.5 text-xs text-white">{anexo.nombre}</Typography.Text>
                                   </div>
                                 ))}
                               </div>
@@ -374,7 +374,7 @@ function RouteComponent() {
                     <Col span={12} className="flex justify-end">
                       {pasoActual < pasosConfig.length - 1 ? (
                         <Button htmlType="button" className="bg-[#731C38] text-white" onClick={siguiente}>
-                          Siguiente: {pasosConfig[pasoActual + 1].title}
+                          Siguiente
                         </Button>
                       ) : (
                         <Button className="bg-[#731C38] text-white" htmlType="submit" loading={creandoEvento}>

@@ -2,7 +2,7 @@ import { DefaultContainer } from "@base/components/layout/containers/DefaultCont
 import { CrudHeader } from "@base/components/layout/crud/CrudHeader";
 import { PaginaProvider, usePagina } from "@base/hooks/usePagina/usePagina";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Button, Col, Input, Row, Select, Tag, Typography, DatePicker } from "antd";
+import { Button, Col, Input, Row, Select, Tag, Typography, DatePicker, Tooltip } from "antd";
 import { Evento as ModelClass } from "@/models/Evento.model";
 import { CategoriaEvento } from "@/models/CategoriaEvento.model";
 import { Carrera } from "@/models/Carrera.model";
@@ -367,7 +367,7 @@ function RouteComponent() {
 
   return (
     <DefaultContainer className="h-full">
-      <Row gutter={[24, 16]}>
+      <Row gutter={[24, 12]}>
         <Col span={24}>
           <CrudHeader
             titulo={ModelClass.CLASS_NAME}
@@ -377,16 +377,10 @@ function RouteComponent() {
         </Col>
 
         <Col span={24}>
-          <div className="rounded-lg border border-stone-200 bg-white p-4">
-            <Row gutter={[16, 12]}>
-              <Col xs={24} md={12} lg={6}>
-                <div className="flex flex-col justify-center">
-                  <Typography.Text
-                    className="block text-sm font-semibold text-[#731C38] mb-1"
-                  >
-                    Buscar
-                  </Typography.Text>
-
+          <div className="rounded-lg border border-stone-200 bg-white p-3">
+            <Row gutter={[12, 12]} align="middle">
+              <Col xs={24} sm={12} xl={6}>
+                <div className="flex min-h-8 items-center">
                   <Input
                     prefix={<SearchOutlined className="text-xs text-stone-400" />}
                     suffix={
@@ -400,20 +394,15 @@ function RouteComponent() {
                     }
                     value={buscador}
                     onChange={(e) => setBuscador(e.target.value)}
-                    placeholder="Nombre del evento..."
+                    placeholder="Buscar evento"
                     allowClear={false}
                     className="text-sm"
                   />
                 </div>
               </Col>
 
-              <Col xs={24} md={12} lg={6}>
-                <div className="flex flex-col justify-center">
-                  <Typography.Text
-                    className="block text-sm font-semibold text-[#731C38] mb-1"
-                  >
-                    Categoría
-                  </Typography.Text>
+              <Col xs={24} sm={12} xl={6}>
+                <div className="flex min-h-8 items-center">
                   <SelectorQuery
                     value={filtros.idCategoriaEvento || undefined}
                     onChange={(v: string | undefined) =>
@@ -428,7 +417,7 @@ function RouteComponent() {
                       },
                     }}
                     selectProps={{
-                      placeholder: `Selecciona ${CategoriaEvento.CLASS_NAME}`,
+                      placeholder: "Todas las categorías",
                       allowClear: true,
                       className: "w-full",
                     }}
@@ -437,13 +426,8 @@ function RouteComponent() {
                 </div>
               </Col>
 
-              <Col xs={24} md={12} lg={6}>
-                <div className="flex flex-col justify-center">
-                  <Typography.Text
-                    className="block text-sm font-semibold text-[#731C38] mb-1"
-                  >
-                    Carrera
-                  </Typography.Text>
+              <Col xs={24} sm={12} xl={6}>
+                <div className="flex min-h-8 items-center">
                   <SelectorQuery
                     value={filtros.idCarrera || undefined}
                     onChange={(v: string | undefined) =>
@@ -458,7 +442,7 @@ function RouteComponent() {
                       },
                     }}
                     selectProps={{
-                      placeholder: `Selecciona ${Carrera.CLASS_NAME}`,
+                      placeholder: "Todas las carreras",
                       allowClear: true,
                       className: "w-full",
                     }}
@@ -467,13 +451,8 @@ function RouteComponent() {
                 </div>
               </Col>
 
-              <Col xs={24} md={12} lg={6}>
-                <div className="flex flex-col justify-center">
-                  <Typography.Text
-                    className="block text-sm font-semibold text-[#731C38] mb-1"
-                  >
-                    Actividad
-                  </Typography.Text>
+              <Col xs={24} sm={12} xl={6}>
+                <div className="flex min-h-8 items-center">
                   <SelectorQuery
                     value={filtros.idActividad || undefined}
                     onChange={(v: string | undefined) =>
@@ -488,7 +467,7 @@ function RouteComponent() {
                       },
                     }}
                     selectProps={{
-                      placeholder: `Selecciona ${Actividad.CLASS_NAME}`,
+                      placeholder: "Todas las actividades",
                       allowClear: true,
                       className: "w-full",
                     }}
@@ -497,17 +476,12 @@ function RouteComponent() {
                 </div>
               </Col>
 
-              <Col xs={12} md={6} lg={6}>
-                <div className="flex flex-col justify-center">
-                  <Typography.Text
-                    className="block text-sm font-semibold text-[#731C38] mb-1"
-                  >
-                    Estado
-                  </Typography.Text>
+              <Col xs={24} sm={12} xl={6}>
+                <div className="flex min-h-8 items-center">
                   <Select
                     value={filtros.estado || undefined}
                     onChange={(v: string) => updateFiltro("estado", v ?? "")}
-                    placeholder="Todos"
+                    placeholder="Todos los estados"
                     allowClear
                     options={estadoOptions}
                     className="w-full"
@@ -515,17 +489,12 @@ function RouteComponent() {
                 </div>
               </Col>
 
-              <Col xs={12} md={6} lg={6}>
-                <div className="flex flex-col justify-center">
-                  <Typography.Text
-                    className="block text-sm font-semibold text-[#731C38] mb-1"
-                  >
-                    Visibilidad
-                  </Typography.Text>
+              <Col xs={24} sm={12} xl={6}>
+                <div className="flex min-h-8 items-center">
                   <Select
                     value={filtros.visibilidad || undefined}
                     onChange={(v: string) => updateFiltro("visibilidad", v ?? "")}
-                    placeholder="Todas"
+                    placeholder="Todas las visibilidades"
                     allowClear
                     options={visibilidadOptions}
                     className="w-full"
@@ -533,13 +502,8 @@ function RouteComponent() {
                 </div>
               </Col>
 
-              <Col xs={24} md={12} lg={6}>
-                <div className="flex flex-col justify-center">
-                  <Typography.Text
-                    className="block text-sm font-semibold text-[#731C38] mb-1"
-                  >
-                    Periodo
-                  </Typography.Text>
+              <Col xs={24} sm={12} xl={6}>
+                <div className="flex min-h-8 items-center">
                   <DatePicker.RangePicker
                     value={filtros.rangoFechas ?? undefined}
                     onChange={(
@@ -554,20 +518,22 @@ function RouteComponent() {
                       updateFiltro("rangoFechas", [desde, hasta]);
                     }}
                     format="DD/MM/YYYY"
-                    placeholder={["Desde", "Hasta"]}
+                    placeholder={["Fecha inicial", "Fecha final"]}
                     className="w-full"
                   />
                 </div>
               </Col>
 
-              <Col xs={24} md={12} lg={2}>
-                <div className="flex h-full flex-col justify-center">
-                  <Button
-                    size="small"
-                    icon={<ClearOutlined />}
-                    onClick={handleLimpiarFiltros}
-                    className="flex items-center justify-center border border-[#731C38]! bg-[#731C38]! text-white! transition-colors hover:bg-white! hover:text-[#731C38]!"
-                  />
+              <Col xs={24} sm={12} xl={6}>
+                <div className="flex min-h-8 items-center">
+                  <Tooltip title="Limpiar filtros">
+                    <Button
+                      aria-label="Limpiar filtros"
+                      icon={<ClearOutlined />}
+                      onClick={handleLimpiarFiltros}
+                      className="flex items-center justify-center border border-[#731C38]! bg-[#731C38]! text-white! transition-colors hover:bg-white! hover:text-[#731C38]!"
+                    />
+                  </Tooltip>
                 </div>
               </Col>
             </Row>
