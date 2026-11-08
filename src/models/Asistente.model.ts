@@ -4,9 +4,10 @@ import { ModeloBase } from "@base/interfaces/models/modelo-base.model";
 export class Asistente extends ModeloBase {
   idUnidadAcademica?: string;
   idCarrera?: string;
-  carrera?: string;
+  carrera?: string | { nombre?: string };
   expediente?: string;
   nombre?: string;
+  correo?: string;
 
   static CLASS_NAME = "Asistente";
   static BASE_ROUTE = "/asistentes";
@@ -17,7 +18,7 @@ export class Asistente extends ModeloBase {
 
   static EXPAND = {
     DEFAULT:
-      "asistenteEventos",
+      "asistenteEventos,carrera",
   };
 
   static fromJson(data: Partial<Asistente>) {

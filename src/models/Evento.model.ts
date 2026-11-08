@@ -64,7 +64,7 @@ export class Evento extends ModeloBase {
 
   static EXPAND = {
     DEFAULT:
-      "eventoMaterial,eventoMedia,materiales,medias,carrera,categoriaEvento,imagenDestacada,unidadAcademica,actividad,qr,asistentes",
+      "eventoMaterial,eventoMedia,materiales,medias,carrera,categoriaEvento,imagenDestacada,unidadAcademica,actividad,qr,asistentes,asistentes.carrera",
   };
 
   static fromJson(data: Partial<Evento>) {
